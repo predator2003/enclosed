@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: enclosed
+  namespace: enclosed
+  labels:
+    app.kubernetes.io/name: enclosed
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: enclosed
+  ports:
+    - name: http
+      port: 80
+      targetPort: http

@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: enclosed
+  namespace: enclosed
+  labels:
+    app.kubernetes.io/name: enclosed
+spec:
+  # fs-lite storage on a ReadWriteOnce volume supports exactly one writer:
+  # keep replicas at 1 and use the Recreate strategy so the old pod releases
+  # the volume before the new one starts.
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: enclosed
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: enclosed
+    spec:
+      securityContext:
+        # The rootless image runs as UID/GID 1000; fsGroup makes the mounted
+        # volume group-writable for it (PUID/PGID env vars are NOT supported).
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: enclosed
+          # For the WEIN & CO branded build, build and push your own image from
+          # this repository (see deploy/kubernetes/README.md). The upstream
+          # image corentinth/enclosed:latest-rootless works but is unbranded.
+          image: ghcr.io/predator2003/enclosed:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8787
+          envFrom:
+            - configMapRef:
+                name: enclosed-config
+            - secretRef:
+                name: enclosed-secrets
+          volumeMounts:
+            - name: data
+              mountPath: /app/.data
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          readinessProbe:
+            httpGet:
+              path: /api/ping
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /api/ping
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              # Allow headroom for large encrypted payloads (50 MiB default cap).
+              memory: 512Mi
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: enclosed-data
