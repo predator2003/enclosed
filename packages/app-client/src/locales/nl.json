@@ -1,6 +1,6 @@
 {
   "app": {
-    "title": "Enclosed",
+    "title": "WEIN & CO Notes",
     "description": "Privé en beveiligde notities versturen"
   },
   "insecureContextWarning": {
@@ -20,7 +20,7 @@
     "settings": {
       "documentation": "Documentatie",
       "cli": "Bijgesloten CLI",
-      "support": "Ondersteun Enclosed",
+      "support": "Ondersteun WEIN & CO Notes",
       "report-bug": "Meld een bug",
       "logout": "Uitloggen",
       "contribute-to-i18n": "Bijdragen aan i18n"
@@ -33,8 +33,8 @@
     "version": "Versie"
   },
   "login": {
-    "title": "Inloggen op Enclosed",
-    "description": "Dit is een privé-instantie van Enclosed. Voer je gegevens in om notities te kunnen maken.",
+    "title": "Inloggen op WEIN & CO Notes",
+    "description": "Dit is een privé-instantie van WEIN & CO Notes. Voer je gegevens in om notities te kunnen maken.",
     "email": "Email",
     "password": "Wachtwoord",
     "submit": "Inloggen",

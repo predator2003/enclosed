@@ -8,6 +8,12 @@ import { NoteContextProvider } from './modules/notes/notes.context';
 import { Toaster } from './modules/ui/components/sonner';
 import { getRoutes } from './routes';
 import '@unocss/reset/tailwind.css';
+// Self-hosted brand font (no external font CDN, keeps the CSP on 'self')
+import '@fontsource/mulish/400.css';
+import '@fontsource/mulish/500.css';
+import '@fontsource/mulish/600.css';
+import '@fontsource/mulish/700.css';
+import '@fontsource/mulish/800.css';
 import 'virtual:uno.css';
 import './app.css';
 
