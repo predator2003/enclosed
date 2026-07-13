@@ -10,8 +10,12 @@
   "navbar": {
     "new-note": "Neue Notiz",
     "language": "Sprache",
+    "documentation": "Dokumentation",
+    "change-theme": "Design wechseln",
+    "menu-icon": "Menü-Symbol",
+    "change-language": "Sprache wechseln",
     "theme": {
-      "theme": "Theme",
+      "theme": "Design",
       "light-mode": "Heller Modus",
       "dark-mode": "Dunkler Modus",
       "system-mode": "Systemeinstellungen"
@@ -32,7 +36,7 @@
     "description": "Dies ist eine private Instanz von WEIN & CO Notes. Geben Sie Ihre Anmeldedaten ein, um Notizen erstellen zu können.",
     "email": "E-Mail",
     "password": "Passwort",
-    "submit": "Login",
+    "submit": "Anmelden",
     "errors": {
       "invalid-credentials": "Ungültige E-Mail oder ungültiges Passwort.",
       "unknown": "Ein unbekannter Fehler ist aufgetreten. Bitte versuchen Sie es später noch einmal."
@@ -48,6 +52,7 @@
       "rate-limit": "Sie haben das Limit für die Erstellung von Notizen überschritten. Bitte versuchen Sie es später erneut.",
       "too-large": "Der Inhalt der Notiz und die Anhänge sind zu groß. Bitte verkleinern Sie die Größe und versuchen Sie es erneut.",
       "unauthorized": "Sie sind nicht berechtigt, Notizen zu erstellen. Bitte melden Sie sich an und versuchen Sie es erneut.",
+      "api-not-found": "Der API-Endpunkt wurde nicht gefunden. Der Server ist möglicherweise nicht korrekt konfiguriert.",
       "unknown": "Beim Erstellen der Notiz ist ein Fehler aufgetreten, bitte versuchen Sie es erneut."
     },
     "share": {
@@ -59,9 +64,13 @@
       "placeholder": "Schreiben Sie Ihre Notiz hier...",
       "password": {
         "label": "Notiz Passwort",
-        "placeholder": "Passwort..."
+        "placeholder": "Passwort...",
+        "hide-password": "Passwort verbergen",
+        "show-password": "Passwort anzeigen",
+        "generate-random-password": "Zufälliges Passwort generieren"
       },
       "expiration": "Verfallszeit",
+      "no-expiration": "Die Notiz läuft nie ab",
       "delays": {
         "1h": "1 Stunde",
         "1d": "1 Tag",
@@ -86,13 +95,26 @@
       "with-deletion": "Die Notiz wird nach dem Lesen automatisch gelöscht.",
       "copy-link": "Link kopieren",
       "copy-success": "Der Link wurde kopiert"
+    },
+    "qr-code": {
+      "title": "Notiz am Mobilgerät teilen",
+      "description": "Scannen Sie diesen QR-Code, um die Notiz auf Ihrem Mobilgerät zu öffnen. Sie können den QR-Code auch als Bild exportieren und weitergeben.",
+      "export": "QR-Code exportieren",
+      "download-svg": "Als SVG herunterladen",
+      "download-png": "Als PNG herunterladen",
+      "download-success": "QR-Code heruntergeladen",
+      "copy-svg": "SVG-Code kopieren",
+      "copy-success": "SVG in die Zwischenablage kopiert"
     }
   },
   "view": {
+    "loading": "Notiz wird geladen...",
     "note-content": "Inhalt der Notiz",
     "assets": {
       "download": "Herunterladen",
-      "download-all": "Alle Dateien herunterladen"
+      "download-all": "Alle Dateien herunterladen",
+      "heading-multiple": "{{ count }} Dateien an dieser Notiz angehängt",
+      "heading-single": "1 Datei an dieser Notiz angehängt"
     },
     "request-password": {
       "description": "Diese Notiz ist passwortgeschützt. Bitte geben Sie das Passwort ein, um sie zu entsperren.",

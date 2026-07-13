@@ -89,11 +89,11 @@ export const Navbar: Component = () => {
 
   return (
     <div class="bg-[hsl(var(--brand))] text-[hsl(var(--brand-foreground))]">
-      <div class="flex items-center justify-between px-6 py-3 mx-auto max-w-1200px">
-        <div class="flex items-center gap-3">
-          <img src="/logo.svg" alt="WEIN & CO Logo" class="h-9 w-9 rounded-sm flex-shrink-0" />
+      <div class="flex items-center justify-between px-6 py-4 mx-auto max-w-1200px">
+        <div class="flex items-center gap-4">
+          <img src="/logo.svg" alt="WEIN & CO Logo" class="h-13 w-13 rounded-md shadow-md flex-shrink-0" />
 
-          <Button variant="link" class="text-lg font-semibold text-[hsl(var(--brand-foreground))] border-b border-transparent hover:(no-underline !border-white/60) h-auto py-0 px-1 ml--1 rounded-none !transition-border-color-250" onClick={newNoteClicked}>
+          <Button variant="link" class="text-xl font-semibold text-[hsl(var(--brand-foreground))] border-b border-transparent hover:(no-underline !border-white/60) h-auto py-0 px-1 ml--1 rounded-none !transition-border-color-250" onClick={newNoteClicked}>
             {t('app.title')}
           </Button>
 
