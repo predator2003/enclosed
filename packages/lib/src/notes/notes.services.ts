@@ -1,6 +1,6 @@
 import { apiClient } from '../api/api.client';
 
-export { fetchNote, storeNote };
+export { confirmNoteRead, fetchNote, storeNote };
 
 async function storeNote({
   payload,
@@ -34,6 +34,24 @@ async function storeNote({
   });
 
   return { noteId };
+}
+
+async function confirmNoteRead({
+  noteId,
+  apiBaseUrl,
+}: {
+  noteId: string;
+  apiBaseUrl?: string;
+}): Promise<{ deleted: boolean }> {
+  // Tells the server the note was successfully decrypted; delete-after-reading
+  // notes are only deleted once this confirmation is received.
+  const { deleted } = await apiClient<{ deleted: boolean }>({
+    path: `api/notes/${noteId}/read-confirmation`,
+    baseUrl: apiBaseUrl,
+    method: 'POST',
+  });
+
+  return { deleted };
 }
 
 async function fetchNote({

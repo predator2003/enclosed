@@ -49,6 +49,81 @@ describe('e2e', () => {
       });
     });
 
+    test('a delete-after-reading note survives fetches and is only deleted once the read is confirmed', async () => {
+      const { storage } = createMemoryStorage();
+
+      const { app } = createServer({
+        storageFactory: () => ({ storage }),
+      });
+
+      const createNoteResponse = await app.request(
+        '/api/notes',
+        {
+          method: 'POST',
+          body: JSON.stringify({
+            payload: '<encrypted-content>',
+            deleteAfterReading: true,
+            ttlInSeconds: 600,
+            encryptionAlgorithm: 'aes-256-gcm',
+            serializationFormat: 'cbor-array',
+          }),
+          headers: new Headers({ 'Content-Type': 'application/json' }),
+        },
+      );
+
+      expect(createNoteResponse.status).to.eql(200);
+
+      const { noteId } = await createNoteResponse.json<any>();
+
+      // Fetching does not delete the note: a wrong password attempt or a link
+      // prefetch must not destroy it
+      const firstFetchResponse = await app.request(`/api/notes/${noteId}`);
+      expect(firstFetchResponse.status).to.eql(200);
+
+      const secondFetchResponse = await app.request(`/api/notes/${noteId}`);
+      expect(secondFetchResponse.status).to.eql(200);
+
+      // The client confirms the successful decryption, which deletes the note
+      const confirmResponse = await app.request(`/api/notes/${noteId}/read-confirmation`, { method: 'POST' });
+      expect(confirmResponse.status).to.eql(200);
+      expect(await confirmResponse.json()).to.eql({ deleted: true });
+
+      const fetchAfterConfirmResponse = await app.request(`/api/notes/${noteId}`);
+      expect(fetchAfterConfirmResponse.status).to.eql(404);
+    });
+
+    test('confirming the read of a note that is not delete-after-reading does not delete it', async () => {
+      const { storage } = createMemoryStorage();
+
+      const { app } = createServer({
+        storageFactory: () => ({ storage }),
+      });
+
+      const createNoteResponse = await app.request(
+        '/api/notes',
+        {
+          method: 'POST',
+          body: JSON.stringify({
+            payload: '<encrypted-content>',
+            deleteAfterReading: false,
+            ttlInSeconds: 600,
+            encryptionAlgorithm: 'aes-256-gcm',
+            serializationFormat: 'cbor-array',
+          }),
+          headers: new Headers({ 'Content-Type': 'application/json' }),
+        },
+      );
+
+      const { noteId } = await createNoteResponse.json<any>();
+
+      const confirmResponse = await app.request(`/api/notes/${noteId}/read-confirmation`, { method: 'POST' });
+      expect(confirmResponse.status).to.eql(200);
+      expect(await confirmResponse.json()).to.eql({ deleted: false });
+
+      const fetchResponse = await app.request(`/api/notes/${noteId}`);
+      expect(fetchResponse.status).to.eql(200);
+    });
+
     test('an enregistered serialization format results in a bad request', async () => {
       const { storage } = createMemoryStorage();
 

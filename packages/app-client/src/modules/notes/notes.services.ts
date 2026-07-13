@@ -1,6 +1,6 @@
 import { apiClient } from '../shared/http/http-client';
 
-export { fetchNoteById, fetchNoteExists, storeNote };
+export { confirmNoteRead, fetchNoteById, fetchNoteExists, storeNote };
 
 async function storeNote({
   payload,
@@ -46,6 +46,15 @@ async function fetchNoteById({ noteId }: { noteId: string }) {
   });
 
   return { note };
+}
+
+async function confirmNoteRead({ noteId }: { noteId: string }) {
+  const { deleted } = await apiClient<{ deleted: boolean }>({
+    path: `/api/notes/${noteId}/read-confirmation`,
+    method: 'POST',
+  });
+
+  return { deleted };
 }
 
 async function fetchNoteExists({ noteId }: { noteId: string }) {

@@ -13,7 +13,7 @@ import { decryptNote, noteAssetsToFiles, parseNoteUrlHashFragment } from '@enclo
 import { useLocation, useNavigate, useParams } from '@solidjs/router';
 import JSZip from 'jszip';
 import { type Component, createSignal, type JSX, Match, onMount, Show, Switch } from 'solid-js';
-import { fetchNoteById, fetchNoteExists } from '../notes.services';
+import { confirmNoteRead, fetchNoteById, fetchNoteExists } from '../notes.services';
 
 const RequestPasswordForm: Component<{ onPasswordEntered: (args: { password: string }) => void; getIsPasswordInvalid: () => boolean; setIsPasswordInvalid: (value: boolean) => void }> = (props) => {
   const [getPassword, setPassword] = createSignal('');
@@ -77,6 +77,7 @@ export const ViewNotePage: Component = () => {
 
   const [getEncryptionKey, setEncryptionKey] = createSignal('');
   const [getIsPasswordProtected, setIsPasswordProtected] = createSignal(false);
+  const [getIsDeletedAfterReading, setIsDeletedAfterReading] = createSignal(false);
 
   const { t } = useI18n();
   const navigate = useNavigate();
@@ -124,6 +125,13 @@ export const ViewNotePage: Component = () => {
     setFileAssets(files);
     setDecryptedNote(note.content);
     setIsPasswordEntered(true);
+
+    if (getIsDeletedAfterReading()) {
+      // The note is only deleted server-side once decryption succeeded, so a wrong
+      // password or a link prefetch cannot destroy it. Failures are ignored: the
+      // reader already has the content, and the note still expires with its TTL.
+      void safely(confirmNoteRead({ noteId: params.noteId }));
+    }
   };
 
   onMount(async () => {
@@ -138,6 +146,8 @@ export const ViewNotePage: Component = () => {
     }
 
     const { encryptionKey, isPasswordProtected, isDeletedAfterReading } = parsedHashFragment;
+
+    setIsDeletedAfterReading(isDeletedAfterReading);
 
     if (isDeletedAfterReading) {
       const [noteExistsResult, noteExistsError] = await safely(fetchNoteExists({ noteId: params.noteId }));

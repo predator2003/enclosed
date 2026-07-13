@@ -1,4 +1,5 @@
-import type { ServerInstance } from '../app/server.types';
+import type { Next } from 'hono';
+import type { Context, ServerInstance } from '../app/server.types';
 import { encryptionAlgorithms, serializationFormats } from '@enclosed/lib';
 import { isNil } from 'lodash-es';
 import { z } from 'zod';
@@ -9,7 +10,7 @@ import { ONE_MONTH_IN_SECONDS, TEN_MINUTES_IN_SECONDS } from './notes.constants'
 import { createCannotCreatePrivateNoteOnPublicInstanceError, createExpirationDelayRequiredError, createNotePayloadTooLargeError } from './notes.errors';
 import { formatNoteForApi } from './notes.models';
 import { createNoteRepository } from './notes.repository';
-import { getRefreshedNote } from './notes.usecases';
+import { confirmNoteRead, getRefreshedNote } from './notes.usecases';
 
 export { registerNotesRoutes };
 
@@ -17,40 +18,45 @@ function registerNotesRoutes({ app }: { app: ServerInstance }) {
   setupGetNoteRoute({ app });
   setupGetNoteExistsRoute({ app });
   setupCreateNoteRoute({ app });
+  setupConfirmNoteReadRoute({ app });
+}
+
+// On instances with authentication enabled, non-public notes may only be accessed by
+// authenticated users. Shared by the routes that read or act on a single note.
+async function noteAccessGuardMiddleware(context: Context, next: Next) {
+  const config = context.get('config');
+
+  if (!config.public.isAuthenticationRequired) {
+    return next();
+  }
+
+  const storage = context.get('storage');
+  const { noteId } = context.req.param() as { noteId: string };
+  const isAuthenticated = context.get('isAuthenticated');
+
+  const { getNoteById } = createNoteRepository({ storage });
+
+  const { note } = await getNoteById({ noteId });
+
+  if (!note) {
+    throw createUnauthorizedError();
+  }
+
+  if (note.isPublic) {
+    return next();
+  }
+
+  if (!isAuthenticated) {
+    throw createUnauthorizedError();
+  }
+
+  return next();
 }
 
 function setupGetNoteRoute({ app }: { app: ServerInstance }) {
   app.get(
     '/api/notes/:noteId',
-    async (context, next) => {
-      const config = context.get('config');
-
-      if (!config.public.isAuthenticationRequired) {
-        return next();
-      }
-
-      const storage = context.get('storage');
-      const { noteId } = context.req.param();
-      const isAuthenticated = context.get('isAuthenticated');
-
-      const { getNoteById } = createNoteRepository({ storage });
-
-      const { note } = await getNoteById({ noteId });
-
-      if (!note) {
-        throw createUnauthorizedError();
-      }
-
-      if (note.isPublic) {
-        return next();
-      }
-
-      if (!isAuthenticated) {
-        throw createUnauthorizedError();
-      }
-
-      return next();
-    },
+    noteAccessGuardMiddleware,
 
     async (context) => {
       const { noteId } = context.req.param();
@@ -63,6 +69,24 @@ function setupGetNoteRoute({ app }: { app: ServerInstance }) {
       const { apiNote } = formatNoteForApi({ note });
 
       return context.json({ note: apiNote });
+    },
+  );
+}
+
+function setupConfirmNoteReadRoute({ app }: { app: ServerInstance }) {
+  app.post(
+    '/api/notes/:noteId/read-confirmation',
+    noteAccessGuardMiddleware,
+
+    async (context) => {
+      const { noteId } = context.req.param();
+
+      const storage = context.get('storage');
+      const notesRepository = createNoteRepository({ storage });
+
+      const { deleted } = await confirmNoteRead({ noteId, notesRepository });
+
+      return context.json({ deleted });
     },
   );
 }

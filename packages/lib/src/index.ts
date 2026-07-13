@@ -4,10 +4,11 @@ import { decryptNote, encryptNote } from './crypto/crypto.usecases';
 import { serializationFormats } from './crypto/serialization/serialization.registry';
 import { filesToNoteAssets, fileToNoteAsset, noteAssetsToFiles, noteAssetToFile } from './files/files.models';
 import { createNoteUrl, createNoteUrlHashFragment, parseNoteUrl, parseNoteUrlHashFragment } from './notes/notes.models';
-import { fetchNote, storeNote } from './notes/notes.services';
+import { confirmNoteRead, fetchNote, storeNote } from './notes/notes.services';
 import { createNote } from './notes/notes.usecases';
 
 export {
+  confirmNoteRead,
   createNote,
   createNoteUrl,
   createNoteUrlHashFragment,
