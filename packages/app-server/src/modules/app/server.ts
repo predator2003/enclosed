@@ -4,6 +4,7 @@ import type { ServerInstanceGenerics } from './server.types';
 import { Hono } from 'hono';
 import { bodyLimit } from 'hono/body-limit';
 import { secureHeaders } from 'hono/secure-headers';
+import { createNotePayloadTooLargeError } from '../notes/notes.errors';
 import { registerNotesRoutes } from '../notes/notes.routes';
 import { authenticationMiddleware } from './auth/auth.middleware';
 import { registerAuthRoutes } from './auth/auth.routes';
@@ -17,16 +18,27 @@ import { timeoutMiddleware } from './middlewares/timeout.middleware';
 
 export { createServer };
 
-// The note payload limit is enforced per-route on the parsed body; this limit guards the
-// raw request stream so oversized bodies are rejected while streaming instead of being
+// The note payload limit is enforced per-route on the parsed body; the body limit guards
+// the raw request stream so oversized bodies are rejected while streaming instead of being
 // buffered into memory first. The envelope accounts for the JSON fields around the payload.
-const DEFAULT_MAX_PAYLOAD_BYTES = 1024 * 1024 * 50;
 const BODY_ENVELOPE_OVERHEAD_BYTES = 1024 * 4;
+
+// When the client bundle is served by this server but talks to an API on another origin
+// (an absolute PUBLIC_BASE_API_URL), that origin must be allowed by connect-src.
+function getConnectSources({ config }: { config?: Config }) {
+  const sources = ['\'self\''];
+
+  try {
+    sources.push(new URL(config?.public.baseApiUrl ?? '/').origin);
+  } catch {
+    // Relative base API URL: same-origin, already covered by 'self'
+  }
+
+  return sources;
+}
 
 function createServer({ config, storageFactory }: { config?: Config; storageFactory: BindableStorageFactory }) {
   const app = new Hono<ServerInstanceGenerics>({ strict: true });
-
-  const maxBodyBytes = (config?.notes.maxEncryptedPayloadLength ?? DEFAULT_MAX_PAYLOAD_BYTES) + BODY_ENVELOPE_OVERHEAD_BYTES;
 
   app.use(loggerMiddleware);
   app.use(createConfigMiddleware({ config }));
@@ -42,7 +54,7 @@ function createServer({ config, storageFactory }: { config?: Config; storageFact
       // The client relies on dynamically injected styles for theming.
       styleSrc: ['\'self\'', '\'unsafe-inline\''],
       imgSrc: ['\'self\'', 'data:'],
-      connectSrc: ['\'self\''],
+      connectSrc: getConnectSources({ config }),
       fontSrc: ['\'self\'', 'data:'],
       objectSrc: ['\'none\''],
       baseUri: ['\'self\''],
@@ -57,10 +69,19 @@ function createServer({ config, storageFactory }: { config?: Config; storageFact
       usb: [],
     },
   }));
-  app.use(bodyLimit({
-    maxSize: maxBodyBytes,
-    onError: context => context.json({ error: { code: 'note.payload_too_large', message: 'Note payload is too large' } }, 413),
-  }));
+  // The limit is resolved per request so deployments that only provide config through
+  // the environment (e.g. Cloudflare, where createServer receives no config object)
+  // still honor NOTES_MAX_ENCRYPTED_PAYLOAD_LENGTH.
+  app.use(async (context, next) => {
+    const maxSize = context.get('config').notes.maxEncryptedPayloadLength + BODY_ENVELOPE_OVERHEAD_BYTES;
+
+    return bodyLimit({
+      maxSize,
+      onError: () => {
+        throw createNotePayloadTooLargeError();
+      },
+    })(context, next);
+  });
   app.use(authenticationMiddleware);
 
   registerErrorMiddleware({ app });

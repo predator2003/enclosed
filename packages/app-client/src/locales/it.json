@@ -9,9 +9,7 @@
   },
   "navbar": {
     "new-note": "Nuova nota",
-    "github": "GitHub",
     "language": "Lingua",
-    "github-repository": "Repository GitHub",
     "documentation": "Documentazione",
     "change-theme": "Cambia tema",
     "menu-icon": "Icona menu",
@@ -25,16 +23,12 @@
     "settings": {
       "documentation": "Documentazione",
       "cli": "WEIN & CO Notes CLI",
-      "support": "Sostieni WEIN & CO Notes",
       "report-bug": "Segnala un bug",
       "logout": "Disconnetti",
       "contribute-to-i18n": "Contribuisci alla traduzione"
     }
   },
   "footer": {
-    "crafted-by": "Creato da",
-    "source-code": "Codice sorgente disponibile su",
-    "github": "GitHub",
     "version": "Versione"
   },
   "login": {

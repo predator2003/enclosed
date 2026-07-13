@@ -40,14 +40,14 @@ export const viewNoteCommand = defineCommand({
         password: isPasswordProtected ? password ?? await promptForPassword() : undefined,
       });
 
+      console.log(note.content);
+
       if (isDeletedAfterReading) {
         // Delete-after-reading notes are only deleted server-side once decryption
-        // succeeded. The content is already available at this point, so a failed
+        // succeeded. The content is already printed at this point, so a failed
         // confirmation must not fail the command.
         await confirmNoteRead({ noteId, apiBaseUrl: getInstanceUrl() }).catch(() => {});
       }
-
-      console.log(note.content);
     } catch (error) {
       if (isApiClientErrorWithStatusCode({ error, statusCode: 404 })) {
         console.error(picocolors.red('Note not found'));

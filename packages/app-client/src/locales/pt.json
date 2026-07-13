@@ -9,7 +9,6 @@
   },
   "navbar": {
     "new-note": "Nova nota",
-    "github": "GitHub",
     "language": "Linguagem",
     "theme": {
       "theme": "Tema",
@@ -20,16 +19,12 @@
     "settings": {
       "documentation": "Documentação",
       "cli": "WEIN & CO Notes CLI",
-      "support": "Ajudar WEIN & CO Notes",
       "report-bug": "Reportar erro",
       "logout": "Terminar sessão",
       "contribute-to-i18n": "Contribuir para i18n"
     }
   },
   "footer": {
-    "crafted-by": "Criado por",
-    "source-code": "Código disponível no",
-    "github": "GitHub",
     "version": "Versão"
   },
   "login": {

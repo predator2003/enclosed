@@ -52,6 +52,9 @@ async function confirmNoteRead({ noteId }: { noteId: string }) {
   const { deleted } = await apiClient<{ deleted: boolean }>({
     path: `/api/notes/${noteId}/read-confirmation`,
     method: 'POST',
+    // The reader may close the tab right after the note is displayed; keepalive
+    // lets the deletion request complete anyway.
+    keepalive: true,
   });
 
   return { deleted };

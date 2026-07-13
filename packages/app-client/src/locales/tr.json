@@ -9,9 +9,7 @@
   },
   "navbar": {
     "new-note": "Yeni not",
-    "github": "GitHub",
     "language": "Dil",
-    "github-repository": "GitHub deposu",
     "documentation": "Dokümantasyon",
     "change-theme": "Temayı değiştir",
     "menu-icon": "Menü simgesi",
@@ -25,16 +23,12 @@
     "settings": {
       "documentation": "Dokümantasyon",
       "cli": "WEIN & CO Notes CLI",
-      "support": "WEIN & CO Notes’a destek olun",
       "report-bug": "Hata bildir",
       "logout": "Çıkış yap",
       "contribute-to-i18n": "i18n’ye katkıda bulunun"
     }
   },
   "footer": {
-    "crafted-by": "Hazırlayan",
-    "source-code": "Kaynak kodu",
-    "github": "GitHub",
     "version": "Sürüm"
   },
   "login": {

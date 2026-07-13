@@ -1,8 +1,9 @@
 /*
  * WEIN & CO corporate theme.
  * Values are derived from the weinco.at corporate identity:
- * brand red #BC0936 (hover #9F082F), champagne gold #CFBB79,
- * warm greys #F5F1F1 / #EEE9E9 / #D9D4D0, charcoal text #3C3C3B.
+ * brand red #BC0936 (hover #9F082F), warm greys #F5F1F1 / #EEE9E9 / #D9D4D0,
+ * charcoal text #3C3C3B. (Champagne gold #CFBB79 = hsl(46 47% 64%) is part of
+ * the corporate palette and can be added as an accent when needed.)
  */
 :root {
   --background: 0 0% 100%;
@@ -39,9 +40,6 @@
   --border: 27 11% 83%;
   --input: 27 11% 83%;
   --ring: 345 91% 39%;
-
-  /* Champagne gold #CFBB79, available as an optional premium accent */
-  --gold: 46 47% 64%;
 
   /* The header keeps the brand red in both color modes */
   --brand: 345 91% 39%;
@@ -82,11 +80,6 @@
   --border: 0 0% 18%;
   --input: 0 0% 18%;
   --ring: 345 90% 45%;
-
-  --gold: 46 47% 64%;
-
-  --brand: 345 91% 39%;
-  --brand-foreground: 0 0% 100%;
 }
 
 

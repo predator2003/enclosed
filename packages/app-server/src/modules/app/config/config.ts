@@ -2,6 +2,10 @@ import type { ConfigDefinition } from 'figue';
 import { defineConfig } from 'figue';
 import { z } from 'zod';
 
+// Publicly known placeholder secret; entrypoints guard against booting an
+// authenticated instance with it (see index.node.ts).
+export const DEFAULT_JWT_SECRET = 'change-me';
+
 export const configDefinition = {
   env: {
     doc: 'The application environment.',
@@ -211,7 +215,7 @@ export const configDefinition = {
     jwtSecret: {
       doc: 'The secret used to sign the JWT tokens',
       schema: z.string(),
-      default: 'change-me',
+      default: DEFAULT_JWT_SECRET,
       env: 'AUTHENTICATION_JWT_SECRET',
     },
     jwtDurationSeconds: {

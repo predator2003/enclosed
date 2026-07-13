@@ -1,8 +1,15 @@
 import type { NotesRepository } from './notes.types';
+import { isNil } from 'lodash-es';
+import { ONE_DAY_IN_SECONDS } from './notes.constants';
 import { createNoteNotFoundError } from './notes.errors';
 import { isNoteExpired } from './notes.models';
 
-export { confirmNoteRead, getRefreshedNote };
+export { confirmNoteRead, DELETE_AFTER_READING_FALLBACK_TTL_SECONDS, getRefreshedNote };
+
+// Backstop for readers that fetch a delete-after-reading note but never confirm
+// (old clients, plain curl): once fetched, a note without expiration gets one so
+// it cannot stay readable forever.
+const DELETE_AFTER_READING_FALLBACK_TTL_SECONDS = ONE_DAY_IN_SECONDS;
 
 async function getRefreshedNote({
   noteId,
@@ -26,6 +33,9 @@ async function getRefreshedNote({
   // so deleting on fetch would destroy the note on a wrong password attempt or a
   // link-preview prefetch. Deletion happens when the client confirms a successful
   // decryption via confirmNoteRead (https://github.com/CorentinTh/enclosed/issues/307).
+  if (note.deleteAfterReading && isNil(note.expirationDate)) {
+    await notesRepository.setNoteExpiration({ noteId, ttlInSeconds: DELETE_AFTER_READING_FALLBACK_TTL_SECONDS, now });
+  }
 
   return {
     note,

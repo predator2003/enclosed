@@ -3,7 +3,6 @@ import { buildTimeConfig } from '@/modules/config/config.constants';
 import { getConfig } from '@/modules/config/config.provider';
 import { buildDocUrl } from '@/modules/docs/docs.models';
 import { useI18n } from '@/modules/i18n/i18n.provider';
-import { useNoteContext } from '@/modules/notes/notes.context';
 import { cn } from '@/modules/shared/style/cn';
 import { useThemeStore } from '@/modules/theme/theme.store';
 import { Button } from '@/modules/ui/components/button';
@@ -68,18 +67,20 @@ const LanguageSwitcher: Component = () => {
   );
 };
 
+// Header icon buttons sit on the brand-red bar and need white icons in both color modes
+const brandBarIconTriggerClass = 'text-lg px-0 size-9 text-[hsl(var(--brand-foreground))] hover:bg-white/15 hover:text-[hsl(var(--brand-foreground))]';
+
 export const Navbar: Component = () => {
   const themeStore = useThemeStore();
-  const { triggerResetNoteForm } = useNoteContext();
   const { t } = useI18n();
 
   const config = getConfig();
 
   const newNoteClicked = () => {
-    triggerResetNoteForm();
     // Full document navigation instead of client-side routing so an authenticating
     // reverse proxy (Authelia, oauth2-proxy, ...) in front of the instance gets a
-    // request and can challenge the user before the create-note UI loads.
+    // request and can challenge the user before the create-note UI loads. The full
+    // reload also resets the note form, so no explicit reset is needed.
     window.location.assign('/');
   };
 
@@ -111,7 +112,7 @@ export const Navbar: Component = () => {
           )}
 
           <DropdownMenu>
-            <DropdownMenuTrigger as={Button} class="text-lg px-0 size-9 hidden md:inline-flex text-[hsl(var(--brand-foreground))] hover:bg-white/15 hover:text-[hsl(var(--brand-foreground))]" variant="ghost" aria-label={t('navbar.change-theme')}>
+            <DropdownMenuTrigger as={Button} class={`${brandBarIconTriggerClass} hidden md:inline-flex`} variant="ghost" aria-label={t('navbar.change-theme')}>
               <div classList={{ 'i-tabler-moon': themeStore.getColorMode() === 'dark', 'i-tabler-sun': themeStore.getColorMode() === 'light' }}></div>
             </DropdownMenuTrigger>
             <DropdownMenuContent class="w-42">
@@ -120,7 +121,7 @@ export const Navbar: Component = () => {
           </DropdownMenu>
 
           <DropdownMenu>
-            <DropdownMenuTrigger as={Button} class="text-lg px-0 size-9 hidden md:inline-flex text-[hsl(var(--brand-foreground))] hover:bg-white/15 hover:text-[hsl(var(--brand-foreground))]" variant="ghost" aria-label={t('navbar.language')}>
+            <DropdownMenuTrigger as={Button} class={`${brandBarIconTriggerClass} hidden md:inline-flex`} variant="ghost" aria-label={t('navbar.language')}>
               <div class="i-custom-language size-4"></div>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
@@ -130,7 +131,7 @@ export const Navbar: Component = () => {
 
           <DropdownMenu>
 
-            <DropdownMenuTrigger as={Button} class="text-lg px-0 size-9 text-[hsl(var(--brand-foreground))] hover:bg-white/15 hover:text-[hsl(var(--brand-foreground))]" variant="ghost" aria-label={t('navbar.menu-icon')}>
+            <DropdownMenuTrigger as={Button} class={brandBarIconTriggerClass} variant="ghost" aria-label={t('navbar.menu-icon')}>
               <div class="i-tabler-dots-vertical hidden md:block"></div>
               <div class="i-tabler-menu-2 block md:hidden"></div>
             </DropdownMenuTrigger>

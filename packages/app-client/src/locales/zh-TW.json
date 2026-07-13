@@ -9,9 +9,7 @@
   },
   "navbar": {
     "new-note": "新筆記",
-    "github": "GitHub",
     "language": "語言",
-    "github-repository": "GitHub 倉庫",
     "documentation": "文件",
     "change-theme": "更改主題",
     "menu-icon": "選單圖示",
@@ -25,16 +23,12 @@
     "settings": {
       "documentation": "文件",
       "cli": "WEIN & CO Notes CLI",
-      "support": "支持 WEIN & CO Notes",
       "report-bug": "報告錯誤",
       "logout": "登出",
       "contribute-to-i18n": "貢獻國際化語言"
     }
   },
   "footer": {
-    "crafted-by": "由",
-    "source-code": "源碼可在",
-    "github": "GitHub",
     "version": "版本"
   },
   "login": {

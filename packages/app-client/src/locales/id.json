@@ -9,9 +9,7 @@
   },
   "navbar": {
     "new-note": "Catatan baru",
-    "github": "GitHub",
     "language": "Bahasa",
-    "github-repository": "Repositori GitHub",
     "documentation": "Dokumentasi",
     "change-theme": "Ubah tema",
     "menu-icon": "Ikon menu",
@@ -25,16 +23,12 @@
     "settings": {
       "documentation": "Dokumentasi",
       "cli": "WEIN & CO Notes CLI",
-      "support": "Dukung WEIN & CO Notes",
       "report-bug": "Laporkan bug",
       "logout": "Keluar",
       "contribute-to-i18n": "Berkontribusi pada i18n"
     }
   },
   "footer": {
-    "crafted-by": "Dibuat oleh",
-    "source-code": "Kode sumber tersedia di",
-    "github": "GitHub",
     "version": "Versi"
   },
   "login": {

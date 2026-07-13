@@ -9,7 +9,6 @@
   },
   "navbar": {
     "new-note": "Nieuwe notitie",
-    "github": "GitHub",
     "language": "Taal",
     "theme": {
       "theme": "Thema",
@@ -20,16 +19,12 @@
     "settings": {
       "documentation": "Documentatie",
       "cli": "Bijgesloten CLI",
-      "support": "Ondersteun WEIN & CO Notes",
       "report-bug": "Meld een bug",
       "logout": "Uitloggen",
       "contribute-to-i18n": "Bijdragen aan i18n"
     }
   },
   "footer": {
-    "crafted-by": "Gemaakt door",
-    "source-code": "Broncode beschikbaar op",
-    "github": "GitHub",
     "version": "Versie"
   },
   "login": {

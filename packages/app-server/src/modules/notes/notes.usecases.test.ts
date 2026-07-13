@@ -37,7 +37,7 @@ describe('notes usecases', () => {
         deleteAfterReading: false,
       });
 
-      expect(
+      await expect(
         getRefreshedNote({
           noteId: 'note-1',
           notesRepository: createNoteRepository({ storage }),
@@ -55,7 +55,7 @@ describe('notes usecases', () => {
         deleteAfterReading: false,
       });
 
-      expect(
+      await expect(
         getRefreshedNote({
           noteId: 'note-1',
           notesRepository: createNoteRepository({ storage }),
@@ -107,7 +107,7 @@ describe('notes usecases', () => {
 
       expect(deleted).to.eql(true);
 
-      expect(
+      await expect(
         getRefreshedNote({
           noteId: 'note-1',
           notesRepository: createNoteRepository({ storage }),
@@ -144,12 +144,65 @@ describe('notes usecases', () => {
     test('confirming the read of a missing note rejects with a not-found error', async () => {
       const { storage } = createMemoryStorage();
 
-      expect(
+      await expect(
         confirmNoteRead({
           noteId: 'unknown-note',
           notesRepository: createNoteRepository({ storage }),
         }),
       ).rejects.toThrow(createNoteNotFoundError());
+    });
+  });
+
+  describe('delete-after-reading fallback expiration', () => {
+    test('fetching a delete-after-reading note without expiration assigns the fallback TTL so an unconfirmed read cannot keep it alive forever', async () => {
+      const { storage } = createMemoryStorage();
+
+      storage.setItem('note-1', {
+        content: '<encrypted-content>',
+        deleteAfterReading: true,
+      });
+
+      await getRefreshedNote({
+        noteId: 'note-1',
+        notesRepository: createNoteRepository({ storage }),
+        now: new Date('2024-01-01T00:00:00Z'),
+      });
+
+      // Still readable within the fallback window
+      const { note } = await getRefreshedNote({
+        noteId: 'note-1',
+        notesRepository: createNoteRepository({ storage }),
+        now: new Date('2024-01-01T12:00:00Z'),
+      });
+
+      expect(note.expirationDate).to.eql(new Date('2024-01-02T00:00:00Z'));
+
+      // Expired (and deleted) once the fallback TTL elapsed
+      await expect(
+        getRefreshedNote({
+          noteId: 'note-1',
+          notesRepository: createNoteRepository({ storage }),
+          now: new Date('2024-01-02T00:00:01Z'),
+        }),
+      ).rejects.toThrow(createNoteNotFoundError());
+    });
+
+    test('a delete-after-reading note that already has an expiration keeps it', async () => {
+      const { storage } = createMemoryStorage();
+
+      storage.setItem('note-1', {
+        content: '<encrypted-content>',
+        expirationDate: '2024-01-01T00:10:00.000Z',
+        deleteAfterReading: true,
+      });
+
+      const { note } = await getRefreshedNote({
+        noteId: 'note-1',
+        notesRepository: createNoteRepository({ storage }),
+        now: new Date('2024-01-01T00:00:00Z'),
+      });
+
+      expect(note.expirationDate).to.eql(new Date('2024-01-01T00:10:00.000Z'));
     });
   });
 });

@@ -1,4 +1,7 @@
 /* TEAM */
-Developer: Corentin Thomasset
-Site: https://corentin.tech
-Twitter: @cthmsst
+Organization: WEIN & CO Handelsgesellschaft m.b.H.
+Site: https://www.weinco.at
+
+/* THANKS */
+Based on Enclosed by Corentin Thomasset (Apache 2.0)
+Site: https://github.com/CorentinTh/enclosed

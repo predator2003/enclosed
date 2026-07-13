@@ -36,11 +36,15 @@ async function noteAccessGuardMiddleware(context: Context, next: Next) {
 
   const { getNoteById } = createNoteRepository({ storage });
 
-  const { note } = await getNoteById({ noteId });
+  const { note } = await getNoteById({ noteId }).catch((error) => {
+    // Unauthenticated clients get the same response for a missing note as for an
+    // existing private one, so the route cannot be used as a note-existence oracle.
+    if (!isAuthenticated) {
+      throw createUnauthorizedError();
+    }
 
-  if (!note) {
-    throw createUnauthorizedError();
-  }
+    throw error;
+  });
 
   if (note.isPublic) {
     return next();

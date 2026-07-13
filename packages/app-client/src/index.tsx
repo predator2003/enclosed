@@ -8,12 +8,14 @@ import { NoteContextProvider } from './modules/notes/notes.context';
 import { Toaster } from './modules/ui/components/sonner';
 import { getRoutes } from './routes';
 import '@unocss/reset/tailwind.css';
-// Self-hosted brand font (no external font CDN, keeps the CSP on 'self')
+// Self-hosted brand font (no external font CDN, keeps the CSP on 'self').
+// Weights match actual usage: 300 (font-light), 400/500/600/700 (body, medium,
+// semibold, bold).
+import '@fontsource/mulish/300.css';
 import '@fontsource/mulish/400.css';
 import '@fontsource/mulish/500.css';
 import '@fontsource/mulish/600.css';
 import '@fontsource/mulish/700.css';
-import '@fontsource/mulish/800.css';
 import 'virtual:uno.css';
 import './app.css';
 

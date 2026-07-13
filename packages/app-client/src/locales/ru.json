@@ -9,7 +9,6 @@
   },
   "navbar": {
     "new-note": "Новая заметка",
-    "github": "GitHub",
     "theme": {
       "light-mode": "Светлая тема",
       "dark-mode": "Тёмная тема",
@@ -18,16 +17,12 @@
     "settings": {
       "documentation": "Документация",
       "cli": "WEIN & CO Notes CLI",
-      "support": "Поддержать WEIN & CO Notes",
       "report-bug": "Сообщить об ошибке",
       "logout": "Выйти",
       "contribute-to-i18n": "Внести свой вклад в i18n"
     }
   },
   "footer": {
-    "crafted-by": "Разработано",
-    "source-code": "Исходный код здесь:",
-    "github": "GitHub",
     "version": "Версия"
   },
   "login": {

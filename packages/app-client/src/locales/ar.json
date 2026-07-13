@@ -9,7 +9,6 @@
   },
   "navbar": {
     "new-note": "ملاحظة جديدة",
-    "github": "GitHub",
     "language": "اللغة",
     "theme": {
       "theme": "الشكل",
@@ -20,16 +19,12 @@
     "settings": {
       "documentation": "التوثيق",
       "cli": "مغلق CLI",
-      "support": "الدعم",
       "report-bug": "الإبلاغ عن خطأ",
       "logout": "الخروج",
       "contribute-to-i18n": "المساهمة في الترجمة"
     }
   },
   "footer": {
-    "crafted-by": "من صنع",
-    "source-code": "الكود المصدري متاح على",
-    "github": "GitHub",
     "version": "الإصدار"
   },
   "login": {
