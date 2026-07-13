@@ -83,6 +83,10 @@ export const FileUploaderButton: ParentComponent<{
 
     const files = Array.from(target.files);
 
+    // Clear the input so selecting the same file again (e.g. after removing it
+    // from the list) re-triggers the change event.
+    target.value = '';
+
     uploadFiles({ files });
   };
 
