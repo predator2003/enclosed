@@ -16,7 +16,7 @@ import { SwitchControl, SwitchLabel, SwitchThumb, Switch as SwitchUiComponent } 
 import { Tabs, TabsIndicator, TabsList, TabsTrigger } from '@/modules/ui/components/tabs';
 import { TextArea } from '@/modules/ui/components/textarea';
 import { TextField, TextFieldLabel, TextFieldRoot } from '@/modules/ui/components/textfield';
-import { safely } from '@corentinth/chisels';
+import { formatBytes, safely } from '@corentinth/chisels';
 import { useNavigate } from '@solidjs/router';
 import { type Component, createSignal, Match, onCleanup, onMount, Show, Switch } from 'solid-js';
 import { renderSVG as renderQrCodeSvg } from 'uqr';
@@ -123,6 +123,15 @@ export const CreateNotePage: Component = () => {
   const [getUploadedFiles, setUploadedFiles] = createSignal<File[]>([]);
   const [getIsNoteCreating, setIsNoteCreating] = createSignal(false);
   const [getHasNoExpiration, setHasNoExpiration] = createSignal(config.defaultNoteNoExpiration);
+  const [getUploadPercent, setUploadPercent] = createSignal(0);
+
+  const getFormattedMaxSize = () => formatBytes({ bytes: config.maxNotePayloadBytes });
+
+  // Rough pre-check before encrypting/uploading: encryption and serialization add
+  // roughly a third of overhead, so anything above ~75% of the limit will not fit.
+  const getEstimatedPayloadBytes = () => Math.ceil(
+    (getContent().length + getUploadedFiles().reduce((total, file) => total + file.size, 0)) * 4 / 3,
+  );
 
   function resetNoteForm() {
     setContent('');
@@ -136,6 +145,7 @@ export const CreateNotePage: Component = () => {
     setUploadedFiles([]);
     setIsNoteCreating(false);
     setHasNoExpiration(config.defaultNoteNoExpiration);
+    setUploadPercent(0);
   }
 
   onMount(() => {
@@ -157,7 +167,13 @@ export const CreateNotePage: Component = () => {
       return;
     }
 
+    if (getEstimatedPayloadBytes() > config.maxNotePayloadBytes) {
+      setError({ message: t('create.errors.too-large-with-limit', { size: getFormattedMaxSize() }) });
+      return;
+    }
+
     setIsNoteCreating(true);
+    setUploadPercent(0);
 
     const [createdNote, error] = await safely(encryptAndCreateNote({
       content: getContent(),
@@ -167,9 +183,11 @@ export const CreateNotePage: Component = () => {
       fileAssets: getUploadedFiles(),
       isPublic: getIsPublic(),
       pathPrefix: config.viewNotePathPrefix,
+      onUploadProgress: ({ percent }) => setUploadPercent(percent),
     }));
 
     setIsNoteCreating(false);
+    setUploadPercent(0);
 
     if (!error) {
       const { noteUrl } = createdNote;
@@ -185,7 +203,7 @@ export const CreateNotePage: Component = () => {
     }
 
     if (isHttpErrorWithCode({ error, code: 'note.payload_too_large' })) {
-      setError({ message: t('create.errors.too-large') });
+      setError({ message: t('create.errors.too-large-with-limit', { size: getFormattedMaxSize() }) });
       return;
     }
 
@@ -322,10 +340,25 @@ export const CreateNotePage: Component = () => {
                 {t('create.settings.attach-files')}
               </FileUploaderButton>
 
+              <div class="text-xs text-muted-foreground mt-1 text-center">
+                {t('create.settings.max-size', { size: getFormattedMaxSize() })}
+              </div>
+
               <Button class="mt-2 w-full" onClick={createNote} disabled={getIsNoteCreating()} data-test-id="create-note">
                 <div class={cn('mr-2 text-lg text-muted-foreground', getIsNoteCreating() ? 'i-tabler-loader-2 animate-spin' : 'i-tabler-plus')}></div>
                 {getIsNoteCreating() ? t('create.settings.creating') : t('create.settings.create')}
               </Button>
+
+              <Show when={getIsNoteCreating() && getUploadPercent() > 0}>
+                <div class="mt-2">
+                  <div class="h-2 w-full rounded-full bg-secondary overflow-hidden">
+                    <div class="h-full bg-primary rounded-full transition-all duration-200" style={{ width: `${getUploadPercent()}%` }}></div>
+                  </div>
+                  <div class="text-xs text-muted-foreground mt-1 text-center">
+                    {t('create.settings.uploading', { percent: String(getUploadPercent()) })}
+                  </div>
+                </div>
+              </Show>
             </div>
 
             <div class="flex flex-col gap-1">

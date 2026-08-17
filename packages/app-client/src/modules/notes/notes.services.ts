@@ -1,7 +1,13 @@
+import { authStore } from '../auth/auth.store';
+import { getConfig } from '../config/config.provider';
 import { apiClient } from '../shared/http/http-client';
+import { buildUrl } from '../shared/http/http-client.models';
 
 export { confirmNoteRead, fetchNoteById, fetchNoteExists, storeNote };
 
+// The note payload is sent via XHR instead of fetch because fetch cannot report
+// upload progress (upstream issue #437). Error objects carry the same
+// { status, body } shape as apiClient so the shared http-error helpers work.
 async function storeNote({
   payload,
   ttlInSeconds,
@@ -9,6 +15,7 @@ async function storeNote({
   encryptionAlgorithm,
   serializationFormat,
   isPublic,
+  onUploadProgress,
 }: {
   payload: string;
   ttlInSeconds?: number;
@@ -16,18 +23,57 @@ async function storeNote({
   encryptionAlgorithm: string;
   serializationFormat: string;
   isPublic?: boolean;
+  onUploadProgress?: (args: { percent: number }) => void;
 }) {
-  const { noteId } = await apiClient<{ noteId: string }>({
-    path: '/api/notes',
-    method: 'POST',
-    body: {
+  const config = getConfig();
+  const url = buildUrl({ path: '/api/notes', baseUrl: config.baseApiUrl });
+  const accessToken = authStore.getAccessToken();
+
+  const { noteId } = await new Promise<{ noteId: string }>((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+
+    xhr.open('POST', url);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+
+    if (accessToken) {
+      xhr.setRequestHeader('Authorization', `Bearer ${accessToken}`);
+    }
+
+    xhr.upload.onprogress = (event) => {
+      if (event.lengthComputable) {
+        onUploadProgress?.({ percent: Math.round((event.loaded / event.total) * 100) });
+      }
+    };
+
+    xhr.onload = () => {
+      const parseResponse = () => {
+        try {
+          return JSON.parse(xhr.responseText);
+        } catch {
+          return undefined;
+        }
+      };
+
+      if (xhr.status >= 200 && xhr.status < 300) {
+        resolve(parseResponse());
+        return;
+      }
+
+      const error = new Error(xhr.statusText || `Request failed with status ${xhr.status}`);
+      Object.assign(error, { status: xhr.status, body: parseResponse() });
+      reject(error);
+    };
+
+    xhr.onerror = () => reject(new Error('Network error while storing the note'));
+
+    xhr.send(JSON.stringify({
       payload,
       ttlInSeconds,
       deleteAfterReading,
       serializationFormat,
       encryptionAlgorithm,
       isPublic,
-    },
+    }));
   });
 
   return { noteId };

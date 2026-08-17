@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { createServer as createHttpsServer } from 'node:https';
 import process, { env } from 'node:process';
@@ -6,7 +7,7 @@ import { serve } from '@hono/node-server';
 import { serveStatic } from '@hono/node-server/serve-static';
 import { memoize } from 'lodash-es';
 import { DEFAULT_JWT_SECRET, getConfig } from './modules/app/config/config';
-import { injectPublicConfigInIndex } from './modules/app/config/config.models';
+import { getPublicConfig, injectPublicConfigInIndex } from './modules/app/config/config.models';
 import { createServer } from './modules/app/server';
 import { deleteExpiredNotesTask } from './modules/notes/tasks/delete-expired-notes.tasks';
 import { createLogger } from './modules/shared/logger/logger';
@@ -14,6 +15,24 @@ import { createFsLiteStorage } from './modules/storage/factories/fs-lite.storage
 import { createTaskScheduler } from './modules/tasks/task-scheduler';
 
 const logger = createLogger({ namespace: 'app-server' });
+
+// Docker/Kubernetes secrets are usually mounted as files; the _FILE variants let
+// operators keep secrets out of the environment (upstream issue #426). The file
+// content only fills the variable when the direct variable is not already set.
+for (const name of ['AUTHENTICATION_JWT_SECRET', 'AUTHENTICATION_USERS']) {
+  const filePath = env[`${name}_FILE`];
+
+  if (filePath && !env[name]) {
+    const [content, readError] = safelySync(() => readFileSync(filePath, 'utf-8').trim());
+
+    if (readError) {
+      logger.error({ error: readError, filePath }, `Cannot read ${name}_FILE`);
+      process.exit(1);
+    }
+
+    env[name] = content;
+  }
+}
 
 const [config, configError] = safelySync(() => getConfig({ env }));
 
@@ -60,7 +79,7 @@ app
         return next();
       }
 
-      const { public: publicConfig } = context.get('config');
+      const { publicConfig } = getPublicConfig({ config: context.get('config') });
 
       const indexHtmlContent = await getIndexContent();
       const indexWithConfig = injectPublicConfigInIndex({ publicConfig, indexHtmlContent });

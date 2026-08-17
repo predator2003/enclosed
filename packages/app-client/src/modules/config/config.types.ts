@@ -8,4 +8,7 @@ export type Config = {
   isSettingNoExpirationAllowed: boolean;
   defaultNoteNoExpiration: boolean;
   viewNotePathPrefix: string;
+  maxNotePayloadBytes: number;
+  hideExternalLinks: boolean;
+  hideFooterVersion: boolean;
 };

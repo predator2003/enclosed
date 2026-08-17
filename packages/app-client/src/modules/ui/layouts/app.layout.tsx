@@ -35,6 +35,7 @@ const ThemeSwitcher: Component = () => {
 
 const LanguageSwitcher: Component = () => {
   const { t, getLocale, setLocale, locales } = useI18n();
+  const config = getConfig();
   const languageName = new Intl.DisplayNames(getLocale(), {
     type: 'language',
     languageDisplay: 'standard',
@@ -57,12 +58,14 @@ const LanguageSwitcher: Component = () => {
         </DropdownMenuItem>
       ))}
 
-      <DropdownMenuSeparator />
+      <Show when={!config.hideExternalLinks}>
+        <DropdownMenuSeparator />
 
-      <DropdownMenuItem as="a" class="flex items-center gap-2 cursor-pointer" target="_blank" rel="noopener noreferrer" href="https://github.com/predator2003/enclosed/tree/main/packages/app-client/src/locales">
-        {t('navbar.settings.contribute-to-i18n')}
-        <div class="i-tabler-external-link text-lg text-muted-foreground"></div>
-      </DropdownMenuItem>
+        <DropdownMenuItem as="a" class="flex items-center gap-2 cursor-pointer" target="_blank" rel="noopener noreferrer" href="https://github.com/predator2003/enclosed/tree/main/packages/app-client/src/locales">
+          {t('navbar.settings.contribute-to-i18n')}
+          <div class="i-tabler-external-link text-lg text-muted-foreground"></div>
+        </DropdownMenuItem>
+      </Show>
     </>
   );
 };
@@ -162,20 +165,22 @@ export const Navbar: Component = () => {
               </DropdownMenuSub>
 
               {/* Default items */}
-              <DropdownMenuItem as="a" class="flex items-center gap-2 cursor-pointer" target="_blank" href={buildDocUrl({ path: '/' })}>
-                <div class="i-tabler-file-text text-lg"></div>
-                {t('navbar.settings.documentation')}
-              </DropdownMenuItem>
+              <Show when={!config.hideExternalLinks}>
+                <DropdownMenuItem as="a" class="flex items-center gap-2 cursor-pointer" target="_blank" href={buildDocUrl({ path: '/' })}>
+                  <div class="i-tabler-file-text text-lg"></div>
+                  {t('navbar.settings.documentation')}
+                </DropdownMenuItem>
 
-              <DropdownMenuItem as="a" class="flex items-center gap-2 cursor-pointer" target="_blank" href={buildDocUrl({ path: '/integrations/cli' })}>
-                <div class="i-tabler-terminal text-lg"></div>
-                {t('navbar.settings.cli')}
-              </DropdownMenuItem>
+                <DropdownMenuItem as="a" class="flex items-center gap-2 cursor-pointer" target="_blank" href={buildDocUrl({ path: '/integrations/cli' })}>
+                  <div class="i-tabler-terminal text-lg"></div>
+                  {t('navbar.settings.cli')}
+                </DropdownMenuItem>
 
-              <DropdownMenuItem as="a" class="flex items-center gap-2 cursor-pointer" target="_blank" href="https://github.com/predator2003/enclosed/issues/new" rel="noopener noreferrer">
-                <div class="i-tabler-bug text-lg"></div>
-                {t('navbar.settings.report-bug')}
-              </DropdownMenuItem>
+                <DropdownMenuItem as="a" class="flex items-center gap-2 cursor-pointer" target="_blank" href="https://github.com/predator2003/enclosed/issues/new" rel="noopener noreferrer">
+                  <div class="i-tabler-bug text-lg"></div>
+                  {t('navbar.settings.report-bug')}
+                </DropdownMenuItem>
+              </Show>
 
               {config.isAuthenticationRequired && authStore.getIsAuthenticated() && (
                 <>
@@ -196,8 +201,11 @@ export const Navbar: Component = () => {
   );
 };
 
+const footerLinkClass = 'p-0 text-muted-foreground underline hover:text-primary transition font-normal h-auto';
+
 export const Footer: Component = () => {
   const { t } = useI18n();
+  const config = getConfig();
 
   return (
     <div class="bg-secondary border-t border-border py-6 px-6 text-center text-muted-foreground flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-4">
@@ -206,26 +214,36 @@ export const Footer: Component = () => {
         {' '}
         {new Date().getFullYear()}
         {' '}
-        <Button variant="link" as="a" href="https://www.weinco.at" target="_blank" rel="noopener noreferrer" class="p-0 text-muted-foreground underline hover:text-primary transition font-normal h-auto">WEIN & CO Handelsgesellschaft m.b.H.</Button>
+        <Button variant="link" as="a" href="https://www.weinco.at" target="_blank" rel="noopener noreferrer" class={footerLinkClass}>WEIN & CO Handelsgesellschaft m.b.H.</Button>
+      </div>
+
+      <div>
+        <Button variant="link" as="a" href="https://www.weinco.at/footer/information/impressum" target="_blank" rel="noopener noreferrer" class={footerLinkClass}>{t('footer.imprint')}</Button>
+      </div>
+
+      <div>
+        <Button variant="link" as="a" href="https://www.weinco.at/datenschutz" target="_blank" rel="noopener noreferrer" class={footerLinkClass}>{t('footer.privacy')}</Button>
       </div>
 
       <div>
         Powered by
         {' '}
-        <Button variant="link" as="a" href="https://github.com/CorentinTh/enclosed" target="_blank" rel="noopener noreferrer" class="p-0 text-muted-foreground underline hover:text-primary transition font-normal h-auto">Enclosed</Button>
+        <Button variant="link" as="a" href="https://github.com/CorentinTh/enclosed" target="_blank" rel="noopener noreferrer" class={footerLinkClass}>Enclosed</Button>
         {' '}
         (Apache 2.0)
       </div>
 
-      <div>
-        {t('footer.version')}
-        {' '}
-        <Button variant="link" as="a" href={`https://github.com/predator2003/enclosed/tree/v${buildTimeConfig.enclosedVersion}`} target="_blank" rel="noopener noreferrer" class="p-0 text-muted-foreground underline hover:text-primary transition font-normal h-auto">
-          v
-          {buildTimeConfig.enclosedVersion}
-        </Button>
+      <Show when={!config.hideFooterVersion}>
+        <div>
+          {t('footer.version')}
+          {' '}
+          <Button variant="link" as="a" href={`https://github.com/predator2003/enclosed/tree/v${buildTimeConfig.enclosedVersion}`} target="_blank" rel="noopener noreferrer" class={footerLinkClass}>
+            v
+            {buildTimeConfig.enclosedVersion}
+          </Button>
 
-      </div>
+        </div>
+      </Show>
     </div>
   );
 };

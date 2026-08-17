@@ -10,4 +10,7 @@ export const buildTimeConfig: Config = {
   defaultNoteNoExpiration: import.meta.env.VITE_DEFAULT_NOTE_NO_EXPIRATION === 'true',
   isSettingNoExpirationAllowed: import.meta.env.VITE_IS_SETTING_NO_EXPIRATION_ALLOWED === 'true',
   viewNotePathPrefix: import.meta.env.VITE_VIEW_NOTE_PATH_PREFIX,
+  maxNotePayloadBytes: Number(import.meta.env.VITE_MAX_NOTE_PAYLOAD_BYTES ?? 1024 * 1024 * 50),
+  hideExternalLinks: import.meta.env.VITE_HIDE_EXTERNAL_LINKS === 'true',
+  hideFooterVersion: import.meta.env.VITE_HIDE_FOOTER_VERSION === 'true',
 };

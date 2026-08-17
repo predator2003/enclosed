@@ -29,7 +29,9 @@
     }
   },
   "footer": {
-    "version": "Version"
+    "version": "Version",
+    "imprint": "Impressum",
+    "privacy": "Datenschutzerklärung"
   },
   "login": {
     "title": "An WEIN & CO Notes anmelden",
@@ -53,7 +55,8 @@
       "too-large": "Der Inhalt der Notiz und die Anhänge sind zu groß. Bitte verkleinern Sie die Größe und versuchen Sie es erneut.",
       "unauthorized": "Sie sind nicht berechtigt, Notizen zu erstellen. Bitte melden Sie sich an und versuchen Sie es erneut.",
       "api-not-found": "Der API-Endpunkt wurde nicht gefunden. Der Server ist möglicherweise nicht korrekt konfiguriert.",
-      "unknown": "Beim Erstellen der Notiz ist ein Fehler aufgetreten, bitte versuchen Sie es erneut."
+      "unknown": "Beim Erstellen der Notiz ist ein Fehler aufgetreten, bitte versuchen Sie es erneut.",
+      "too-large-with-limit": "Die Notiz überschreitet die maximale Größe von {{ size }}."
     },
     "share": {
       "button": "Notiz teilen",
@@ -87,7 +90,9 @@
         "description": "Ziehen Sie Dateien hierher, um sie an die Notiz anzuhängen"
       },
       "create": "Notiz erstellen",
-      "creating": "Notiz wird erstellt..."
+      "creating": "Notiz wird erstellt...",
+      "max-size": "Maximale Gesamtgröße: {{ size }}",
+      "uploading": "Wird hochgeladen… {{ percent }} %"
     },
     "success": {
       "title": "Notiz erfolgreich erstellt",

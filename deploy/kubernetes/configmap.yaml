@@ -24,3 +24,10 @@ data:
   # Set to "true" (and provide AUTHENTICATION_USERS in the secret) to require
   # login for creating notes.
   PUBLIC_IS_AUTHENTICATION_REQUIRED: "false"
+  # Hide documentation/report-a-bug menu links and the footer version for the
+  # internal deployment.
+  PUBLIC_HIDE_EXTERNAL_LINKS: "true"
+  PUBLIC_HIDE_FOOTER_VERSION: "true"
+  # API route timeout; the built-in default is 30s — raise it here if large
+  # uploads over slow links still hit 504s.
+  # SERVER_API_ROUTES_TIMEOUT_MS: "60000"

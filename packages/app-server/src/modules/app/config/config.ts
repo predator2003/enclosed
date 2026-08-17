@@ -23,7 +23,9 @@ export const configDefinition = {
     routeTimeoutMs: {
       doc: 'The maximum time in milliseconds for a route to complete before timing out',
       schema: z.coerce.number().int().positive(),
-      default: 5_000,
+      // 30s: file attachments of a few MB regularly exceeded the previous 5s
+      // default on slower uplinks (upstream issue #407)
+      default: 30_000,
       env: 'SERVER_API_ROUTES_TIMEOUT_MS',
     },
     corsOrigins: {
@@ -209,6 +211,28 @@ export const configDefinition = {
       schema: z.string(),
       default: '/',
       env: 'PUBLIC_VIEW_NOTE_PATH_PREFIX',
+    },
+    hideExternalLinks: {
+      doc: 'Whether to hide the documentation, CLI, report-a-bug and i18n-contribution links in the menu (for internal deployments)',
+      schema: z
+        .string()
+        .trim()
+        .toLowerCase()
+        .transform(x => x === 'true')
+        .pipe(z.boolean()),
+      default: 'false',
+      env: 'PUBLIC_HIDE_EXTERNAL_LINKS',
+    },
+    hideFooterVersion: {
+      doc: 'Whether to hide the app version in the footer (version disclosure on hardened deployments)',
+      schema: z
+        .string()
+        .trim()
+        .toLowerCase()
+        .transform(x => x === 'true')
+        .pipe(z.boolean()),
+      default: 'false',
+      env: 'PUBLIC_HIDE_FOOTER_VERSION',
     },
   },
   authentication: {

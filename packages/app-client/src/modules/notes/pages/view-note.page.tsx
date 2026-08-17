@@ -336,7 +336,7 @@ export const ViewNotePage: Component = () => {
 
                 <Card class="w-full rounded-md shadow-sm mb-2">
                   <CardContent class="p-6 overflow-x-auto max-w-100%">
-                    <pre data-test-id="note-content-display">
+                    <pre class="whitespace-pre-wrap break-words" data-test-id="note-content-display">
                       {getDecryptedNote()}
                     </pre>
                   </CardContent>
