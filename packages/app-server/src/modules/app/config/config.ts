@@ -2,6 +2,10 @@ import type { ConfigDefinition } from 'figue';
 import { defineConfig } from 'figue';
 import { z } from 'zod';
 
+// Publicly known placeholder secret; entrypoints guard against booting an
+// authenticated instance with it (see index.node.ts).
+export const DEFAULT_JWT_SECRET = 'change-me';
+
 export const configDefinition = {
   env: {
     doc: 'The application environment.',
@@ -19,7 +23,9 @@ export const configDefinition = {
     routeTimeoutMs: {
       doc: 'The maximum time in milliseconds for a route to complete before timing out',
       schema: z.coerce.number().int().positive(),
-      default: 5_000,
+      // 30s: file attachments of a few MB regularly exceeded the previous 5s
+      // default on slower uplinks (upstream issue #407)
+      default: 30_000,
       env: 'SERVER_API_ROUTES_TIMEOUT_MS',
     },
     corsOrigins: {
@@ -206,12 +212,34 @@ export const configDefinition = {
       default: '/',
       env: 'PUBLIC_VIEW_NOTE_PATH_PREFIX',
     },
+    hideExternalLinks: {
+      doc: 'Whether to hide the documentation, CLI, report-a-bug and i18n-contribution links in the menu (for internal deployments)',
+      schema: z
+        .string()
+        .trim()
+        .toLowerCase()
+        .transform(x => x === 'true')
+        .pipe(z.boolean()),
+      default: 'false',
+      env: 'PUBLIC_HIDE_EXTERNAL_LINKS',
+    },
+    hideFooterVersion: {
+      doc: 'Whether to hide the app version in the footer (version disclosure on hardened deployments)',
+      schema: z
+        .string()
+        .trim()
+        .toLowerCase()
+        .transform(x => x === 'true')
+        .pipe(z.boolean()),
+      default: 'false',
+      env: 'PUBLIC_HIDE_FOOTER_VERSION',
+    },
   },
   authentication: {
     jwtSecret: {
       doc: 'The secret used to sign the JWT tokens',
       schema: z.string(),
-      default: 'change-me',
+      default: DEFAULT_JWT_SECRET,
       env: 'AUTHENTICATION_JWT_SECRET',
     },
     jwtDurationSeconds: {

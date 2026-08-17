@@ -1,15 +1,17 @@
-import type { ServerInstance } from '../app/server.types';
+import type { Next } from 'hono';
+import type { Context, ServerInstance } from '../app/server.types';
 import { encryptionAlgorithms, serializationFormats } from '@enclosed/lib';
 import { isNil } from 'lodash-es';
 import { z } from 'zod';
 import { createUnauthorizedError } from '../app/auth/auth.errors';
 import { protectedRouteMiddleware } from '../app/auth/auth.middleware';
+import { generateToken, sha256Hex } from '../shared/utils/crypto';
 import { validateJsonBody } from '../shared/validation/validation';
 import { ONE_MONTH_IN_SECONDS, TEN_MINUTES_IN_SECONDS } from './notes.constants';
 import { createCannotCreatePrivateNoteOnPublicInstanceError, createExpirationDelayRequiredError, createNotePayloadTooLargeError } from './notes.errors';
 import { formatNoteForApi } from './notes.models';
 import { createNoteRepository } from './notes.repository';
-import { getRefreshedNote } from './notes.usecases';
+import { confirmNoteRead, getRefreshedNote, revokeNote } from './notes.usecases';
 
 export { registerNotesRoutes };
 
@@ -17,40 +19,50 @@ function registerNotesRoutes({ app }: { app: ServerInstance }) {
   setupGetNoteRoute({ app });
   setupGetNoteExistsRoute({ app });
   setupCreateNoteRoute({ app });
+  setupConfirmNoteReadRoute({ app });
+  setupRevokeNoteRoute({ app });
+}
+
+// On instances with authentication enabled, non-public notes may only be accessed by
+// authenticated users. Shared by the routes that read or act on a single note.
+async function noteAccessGuardMiddleware(context: Context, next: Next) {
+  const config = context.get('config');
+
+  if (!config.public.isAuthenticationRequired) {
+    return next();
+  }
+
+  const storage = context.get('storage');
+  const { noteId } = context.req.param() as { noteId: string };
+  const isAuthenticated = context.get('isAuthenticated');
+
+  const { getNoteById } = createNoteRepository({ storage });
+
+  const { note } = await getNoteById({ noteId }).catch((error) => {
+    // Unauthenticated clients get the same response for a missing note as for an
+    // existing private one, so the route cannot be used as a note-existence oracle.
+    if (!isAuthenticated) {
+      throw createUnauthorizedError();
+    }
+
+    throw error;
+  });
+
+  if (note.isPublic) {
+    return next();
+  }
+
+  if (!isAuthenticated) {
+    throw createUnauthorizedError();
+  }
+
+  return next();
 }
 
 function setupGetNoteRoute({ app }: { app: ServerInstance }) {
   app.get(
     '/api/notes/:noteId',
-    async (context, next) => {
-      const config = context.get('config');
-
-      if (!config.public.isAuthenticationRequired) {
-        return next();
-      }
-
-      const storage = context.get('storage');
-      const { noteId } = context.req.param();
-      const isAuthenticated = context.get('isAuthenticated');
-
-      const { getNoteById } = createNoteRepository({ storage });
-
-      const { note } = await getNoteById({ noteId });
-
-      if (!note) {
-        throw createUnauthorizedError();
-      }
-
-      if (note.isPublic) {
-        return next();
-      }
-
-      if (!isAuthenticated) {
-        throw createUnauthorizedError();
-      }
-
-      return next();
-    },
+    noteAccessGuardMiddleware,
 
     async (context) => {
       const { noteId } = context.req.param();
@@ -63,6 +75,24 @@ function setupGetNoteRoute({ app }: { app: ServerInstance }) {
       const { apiNote } = formatNoteForApi({ note });
 
       return context.json({ note: apiNote });
+    },
+  );
+}
+
+function setupConfirmNoteReadRoute({ app }: { app: ServerInstance }) {
+  app.post(
+    '/api/notes/:noteId/read-confirmation',
+    noteAccessGuardMiddleware,
+
+    async (context) => {
+      const { noteId } = context.req.param();
+
+      const storage = context.get('storage');
+      const notesRepository = createNoteRepository({ storage });
+
+      const { deleted } = await confirmNoteRead({ noteId, notesRepository });
+
+      return context.json({ deleted });
     },
   );
 }
@@ -130,9 +160,38 @@ function setupCreateNoteRoute({ app }: { app: ServerInstance }) {
 
       const notesRepository = createNoteRepository({ storage });
 
-      const { noteId } = await notesRepository.saveNote({ payload, ttlInSeconds, deleteAfterReading, encryptionAlgorithm, serializationFormat, isPublic });
+      // The revocation token lets the sender delete the note before it is read
+      // (upstream issue #453). Only its hash is stored; the token itself is
+      // returned exactly once, here.
+      const revocationToken = generateToken();
+      const revocationTokenHash = await sha256Hex(revocationToken);
 
-      return context.json({ noteId });
+      const { noteId } = await notesRepository.saveNote({ payload, ttlInSeconds, deleteAfterReading, encryptionAlgorithm, serializationFormat, isPublic, revocationTokenHash });
+
+      return context.json({ noteId, revocationToken });
+    },
+  );
+}
+
+function setupRevokeNoteRoute({ app }: { app: ServerInstance }) {
+  app.post(
+    '/api/notes/:noteId/revoke',
+    validateJsonBody(
+      z.object({
+        revocationToken: z.string().min(1),
+      }),
+    ),
+
+    async (context) => {
+      const { noteId } = context.req.param();
+      const { revocationToken } = context.req.valid('json');
+
+      const storage = context.get('storage');
+      const notesRepository = createNoteRepository({ storage });
+
+      const { revoked } = await revokeNote({ noteId, revocationToken, notesRepository });
+
+      return context.json({ revoked });
     },
   );
 }

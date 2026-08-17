@@ -1,4 +1,4 @@
-import { decryptNote, fetchNote, isApiClientErrorWithStatusCode, parseNoteUrl } from '@enclosed/lib';
+import { confirmNoteRead, decryptNote, fetchNote, isApiClientErrorWithStatusCode, parseNoteUrl } from '@enclosed/lib';
 import { defineCommand } from 'citty';
 import picocolors from 'picocolors';
 import { getInstanceUrl } from '../config/config.usecases';
@@ -27,7 +27,7 @@ export const viewNoteCommand = defineCommand({
     const { noteUrl, password } = args;
 
     try {
-      const { noteId, encryptionKey, isPasswordProtected } = parseNoteUrl({ noteUrl });
+      const { noteId, encryptionKey, isPasswordProtected, isDeletedAfterReading } = parseNoteUrl({ noteUrl });
 
       const { payload } = await fetchNote({
         noteId,
@@ -41,6 +41,13 @@ export const viewNoteCommand = defineCommand({
       });
 
       console.log(note.content);
+
+      if (isDeletedAfterReading) {
+        // Delete-after-reading notes are only deleted server-side once decryption
+        // succeeded. The content is already printed at this point, so a failed
+        // confirmation must not fail the command.
+        await confirmNoteRead({ noteId, apiBaseUrl: getInstanceUrl() }).catch(() => {});
+      }
     } catch (error) {
       if (isApiClientErrorWithStatusCode({ error, statusCode: 404 })) {
         console.error(picocolors.red('Note not found'));

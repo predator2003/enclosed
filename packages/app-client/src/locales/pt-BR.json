@@ -1,6 +1,6 @@
 {
   "app": {
-    "title": "Enclosed",
+    "title": "WEIN & CO Notes",
     "description": "Envie notas de forma privada e segura"
   },
   "insecureContextWarning": {
@@ -9,7 +9,6 @@
   },
   "navbar": {
     "new-note": "Nova nota",
-    "github": "GitHub",
     "language": "Idioma",
     "theme": {
       "theme": "Aparência",
@@ -19,22 +18,18 @@
     },
     "settings": {
       "documentation": "Documentação",
-      "cli": "Enclosed CLI",
-      "support": "Ajudar Enclosed",
+      "cli": "WEIN & CO Notes CLI",
       "report-bug": "Reportar erro",
       "logout": "Sair",
       "contribute-to-i18n": "Contribuir para i18n"
     }
   },
   "footer": {
-    "crafted-by": "Criado por",
-    "source-code": "Código disponível no",
-    "github": "GitHub",
     "version": "Versão"
   },
   "login": {
-    "title": "Entrar no Enclosed",
-    "description": "Esta é uma instância privada do Enclosed. Insira os dados da sua conta para poder criar notas.",
+    "title": "Entrar no WEIN & CO Notes",
+    "description": "Esta é uma instância privada do WEIN & CO Notes. Insira os dados da sua conta para poder criar notas.",
     "email": "E-mail",
     "password": "Senha",
     "submit": "Entrar",

@@ -17,6 +17,7 @@ function createNoteRepository({ storage }: { storage: Storage }) {
       getNotesIds,
       deleteNoteById,
       getNoteExists,
+      setNoteExpiration,
     },
     {
       storage,
@@ -41,6 +42,7 @@ async function saveNote(
     encryptionAlgorithm,
     serializationFormat,
     isPublic,
+    revocationTokenHash,
   }:
   {
     payload: string;
@@ -52,6 +54,7 @@ async function saveNote(
     encryptionAlgorithm: string;
     serializationFormat: string;
     isPublic: boolean;
+    revocationTokenHash?: string;
   },
 ): Promise<{ noteId: string }> {
   try {
@@ -62,6 +65,7 @@ async function saveNote(
       encryptionAlgorithm,
       serializationFormat,
       isPublic,
+      ...(revocationTokenHash ? { revocationTokenHash } : {}),
     };
 
     if (!ttlInSeconds) {
@@ -109,6 +113,28 @@ async function getNoteById({ noteId, storage }: { noteId: string; storage: Stora
       expirationDate: note.expirationDate ? new Date(note.expirationDate) : undefined,
     },
   };
+}
+
+async function setNoteExpiration({ noteId, ttlInSeconds, now = new Date(), storage }: { noteId: string; ttlInSeconds: number; now?: Date; storage: Storage<DatabaseNote> }) {
+  const note = await storage.getItem(noteId);
+
+  if (!note) {
+    return;
+  }
+
+  const { expirationDate } = getNoteExpirationDate({ ttlInSeconds, now });
+
+  await storage.setItem(
+    noteId,
+    {
+      ...note,
+      expirationDate: expirationDate.toISOString(),
+    },
+    {
+      ttl: ttlInSeconds,
+      expirationTtl: ttlInSeconds,
+    },
+  );
 }
 
 async function deleteNoteById({ noteId, storage }: { noteId: string; storage: Storage }) {

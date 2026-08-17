@@ -3,7 +3,6 @@ import {
   defineConfig,
   presetIcons,
   presetUno,
-  presetWebFonts,
   transformerDirectives,
   transformerVariantGroup,
 } from 'unocss';
@@ -20,12 +19,6 @@ export default defineConfig({
       prefix: '',
     }),
     presetAnimations(),
-    presetWebFonts({
-      provider: 'bunny',
-      fonts: {
-        sans: 'Inter:400,500,600,700,800,900',
-      },
-    }),
     presetIcons({
       collections: {
         custom: {
@@ -36,6 +29,10 @@ export default defineConfig({
   ],
   transformers: [transformerVariantGroup(), transformerDirectives()],
   theme: {
+    // Mulish is bundled via @fontsource (see index.tsx) so no font CDN is needed
+    fontFamily: {
+      sans: 'Mulish, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+    },
     colors: {
       border: 'hsl(var(--border))',
       input: 'hsl(var(--input))',

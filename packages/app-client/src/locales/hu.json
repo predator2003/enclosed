@@ -1,6 +1,6 @@
 {
   "app": {
-    "title": "Enclosed",
+    "title": "WEIN & CO Notes",
     "description": "Küldj privát és biztonságos jegyzeteket"
   },
   "insecureContextWarning": {
@@ -9,7 +9,6 @@
   },
   "navbar": {
     "new-note": "Új jegyzet",
-    "github": "GitHub",
     "language": "Nyelv",
     "theme": {
       "theme": "Megjelenés",
@@ -19,22 +18,18 @@
     },
     "settings": {
       "documentation": "Dokumentáció",
-      "cli": "Enclosed CLI",
-      "support": "Támogasd az Enclosed-ot",
+      "cli": "WEIN & CO Notes CLI",
       "report-bug": "Hiba bejelentése",
       "logout": "Kijelentkezés",
       "contribute-to-i18n": "Közreműködés az i18n-ben"
     }
   },
   "footer": {
-    "crafted-by": "Készítette",
-    "source-code": "Forráskód elérhető a",
-    "github": "GitHubon",
     "version": "Verzió"
   },
   "login": {
-    "title": "Bejelentkezés az Enclosedba",
-    "description": "Ez az Enclosed egy privát példánya. Add meg hitelesítő adataidat a jegyzetek létrehozásához.",
+    "title": "Bejelentkezés a WEIN & CO Notesba",
+    "description": "Ez a WEIN & CO Notes egy privát példánya. Add meg hitelesítő adataidat a jegyzetek létrehozásához.",
     "email": "Email",
     "password": "Jelszó",
     "submit": "Bejelentkezés",
@@ -44,7 +39,7 @@
     },
     "footer": [
       "Nincs fiókod?",
-      "Vedd fel a kapcsolatot az Enclosed privát példányának tulajdonosával."
+      "Vedd fel a kapcsolatot a WEIN & CO Notes privát példányának tulajdonosával."
     ]
   },
   "create": {

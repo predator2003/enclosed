@@ -41,12 +41,12 @@ async function createNote({
     encryptionAlgorithm: EncryptionAlgorithm;
     serializationFormat: SerializationFormat;
     isPublic?: boolean;
-  }) => Promise<{ noteId: string }>;
+  }) => Promise<{ noteId: string; revocationToken?: string }>;
 }) {
   const { encryptedPayload, encryptionKey } = await encryptNote({ content, password, assets, encryptionAlgorithm, serializationFormat });
   const isPasswordProtected = Boolean(password);
 
-  const { noteId } = await storeNote({
+  const { noteId, revocationToken } = await storeNote({
     payload: encryptedPayload,
     ttlInSeconds,
     deleteAfterReading,
@@ -69,5 +69,6 @@ async function createNote({
     encryptionKey,
     noteId,
     noteUrl,
+    revocationToken,
   };
 }

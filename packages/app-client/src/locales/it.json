@@ -1,6 +1,6 @@
 {
   "app": {
-    "title": "Enclosed",
+    "title": "WEIN & CO Notes",
     "description": "Invia note private e sicure"
   },
   "insecureContextWarning": {
@@ -9,9 +9,7 @@
   },
   "navbar": {
     "new-note": "Nuova nota",
-    "github": "GitHub",
     "language": "Lingua",
-    "github-repository": "Repository GitHub",
     "documentation": "Documentazione",
     "change-theme": "Cambia tema",
     "menu-icon": "Icona menu",
@@ -24,22 +22,18 @@
     },
     "settings": {
       "documentation": "Documentazione",
-      "cli": "Enclosed CLI",
-      "support": "Sostieni Enclosed",
+      "cli": "WEIN & CO Notes CLI",
       "report-bug": "Segnala un bug",
       "logout": "Disconnetti",
       "contribute-to-i18n": "Contribuisci alla traduzione"
     }
   },
   "footer": {
-    "crafted-by": "Creato da",
-    "source-code": "Codice sorgente disponibile su",
-    "github": "GitHub",
     "version": "Versione"
   },
   "login": {
-    "title": "Accedi a Enclosed",
-    "description": "Questa è un'istanza privata di Enclosed. Accedi per creare delle note.",
+    "title": "Accedi a WEIN & CO Notes",
+    "description": "Questa è un'istanza privata di WEIN & CO Notes. Accedi per creare delle note.",
     "email": "Email",
     "password": "Password",
     "submit": "Accedi",
@@ -136,7 +130,6 @@
       "description": "Questa nota sarà cancellata dopo la lettura. Una volta visualizzata sarà definitivamente cancellata e non potrà essere recuperata.",
       "confirm": "Capisco, visualizza la nota"
     },
-
     "error": {
       "invalid-url": {
         "title": "URL della nota non valida",

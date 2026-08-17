@@ -1,6 +1,6 @@
 {
   "app": {
-    "title": "Enclosed",
+    "title": "WEIN & CO Notes",
     "description": "Envoyez des notes privées et sécurisées"
   },
   "insecureContextWarning": {
@@ -9,9 +9,7 @@
   },
   "navbar": {
     "new-note": "Nouvelle note",
-    "github": "GitHub",
     "language": "Langue",
-    "github-repository": "Dépôt GitHub",
     "documentation": "Documentation",
     "change-theme": "Changer de thème",
     "menu-icon": "Icône du menu",
@@ -24,22 +22,18 @@
     },
     "settings": {
       "documentation": "Documentation",
-      "cli": "Enclosed CLI",
-      "support": "Soutenir Enclosed",
+      "cli": "WEIN & CO Notes CLI",
       "report-bug": "Signaler un bug",
       "logout": "Se déconnecter",
       "contribute-to-i18n": "Contribuer à l'i18n"
     }
   },
   "footer": {
-    "crafted-by": "Créé par",
-    "source-code": "Code source disponible sur",
-    "github": "GitHub",
     "version": "Version"
   },
   "login": {
-    "title": "Connexion à Enclosed",
-    "description": "Ceci est une instance privée de Enclosed. Entrez vos identifiants pour pouvoir créer des notes.",
+    "title": "Connexion à WEIN & CO Notes",
+    "description": "Ceci est une instance privée de WEIN & CO Notes. Entrez vos identifiants pour pouvoir créer des notes.",
     "email": "Email",
     "password": "Mot de passe",
     "submit": "Se connecter",
@@ -136,7 +130,6 @@
       "description": "Cette note sera supprimée après lecture. Une fois affichée, elle sera définitivement supprimée et ne pourra pas être récupérée.",
       "confirm": "Je comprends, montrer la note"
     },
-
     "error": {
       "invalid-url": {
         "title": "URL de note invalide",

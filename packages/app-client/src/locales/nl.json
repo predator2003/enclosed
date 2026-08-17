@@ -1,6 +1,6 @@
 {
   "app": {
-    "title": "Enclosed",
+    "title": "WEIN & CO Notes",
     "description": "Privé en beveiligde notities versturen"
   },
   "insecureContextWarning": {
@@ -9,7 +9,6 @@
   },
   "navbar": {
     "new-note": "Nieuwe notitie",
-    "github": "GitHub",
     "language": "Taal",
     "theme": {
       "theme": "Thema",
@@ -20,21 +19,17 @@
     "settings": {
       "documentation": "Documentatie",
       "cli": "Bijgesloten CLI",
-      "support": "Ondersteun Enclosed",
       "report-bug": "Meld een bug",
       "logout": "Uitloggen",
       "contribute-to-i18n": "Bijdragen aan i18n"
     }
   },
   "footer": {
-    "crafted-by": "Gemaakt door",
-    "source-code": "Broncode beschikbaar op",
-    "github": "GitHub",
     "version": "Versie"
   },
   "login": {
-    "title": "Inloggen op Enclosed",
-    "description": "Dit is een privé-instantie van Enclosed. Voer je gegevens in om notities te kunnen maken.",
+    "title": "Inloggen op WEIN & CO Notes",
+    "description": "Dit is een privé-instantie van WEIN & CO Notes. Voer je gegevens in om notities te kunnen maken.",
     "email": "Email",
     "password": "Wachtwoord",
     "submit": "Inloggen",

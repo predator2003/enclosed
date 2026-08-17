@@ -1,6 +1,6 @@
 {
   "app": {
-    "title": "Enclosed",
+    "title": "WEIN & CO Notes",
     "description": "Send private and secure notes"
   },
   "insecureContextWarning": {
@@ -9,9 +9,7 @@
   },
   "navbar": {
     "new-note": "New note",
-    "github": "GitHub",
     "language": "Language",
-    "github-repository": "GitHub repository",
     "documentation": "Documentation",
     "change-theme": "Change theme",
     "menu-icon": "Menu icon",
@@ -24,22 +22,20 @@
     },
     "settings": {
       "documentation": "Documentation",
-      "cli": "Enclosed CLI",
-      "support": "Support Enclosed",
+      "cli": "WEIN & CO Notes CLI",
       "report-bug": "Report a bug",
       "logout": "Logout",
       "contribute-to-i18n": "Contribute to i18n"
     }
   },
   "footer": {
-    "crafted-by": "Crafted by",
-    "source-code": "Source code available on",
-    "github": "GitHub",
-    "version": "Version"
+    "version": "Version",
+    "imprint": "Imprint",
+    "privacy": "Privacy policy"
   },
   "login": {
-    "title": "Login to Enclosed",
-    "description": "This is a private instance of Enclosed. Enter your credentials to be able to create notes.",
+    "title": "Login to WEIN & CO Notes",
+    "description": "This is a private instance of WEIN & CO Notes. Enter your credentials to be able to create notes.",
     "email": "Email",
     "password": "Password",
     "submit": "Login",
@@ -59,7 +55,8 @@
       "too-large": "The note content and attachments are too large. Please reduce the size and try again.",
       "unauthorized": "You are not authorized to create notes. Please login and try again.",
       "api-not-found": "The API endpoint is not found. The server may not be configured correctly.",
-      "unknown": "An error occurred while creating the note, please try again."
+      "unknown": "An error occurred while creating the note, please try again.",
+      "too-large-with-limit": "The note exceeds the maximum size of {{ size }}."
     },
     "share": {
       "button": "Share note",
@@ -93,14 +90,22 @@
         "description": "Drag and drop files here to attach them to the note"
       },
       "create": "Create note",
-      "creating": "Creating note..."
+      "creating": "Creating note...",
+      "max-size": "Maximum total size: {{ size }}",
+      "uploading": "Uploading… {{ percent }}%"
     },
     "success": {
       "title": "Note created successfully",
       "description": "Your note has been created. You can now share it using the following link.",
       "with-deletion": "The note will be deleted after reading.",
       "copy-link": "Copy link",
-      "copy-success": "Link copied"
+      "copy-success": "Link copied",
+      "revocation": {
+        "title": "Revocation link",
+        "description": "With this link you can permanently delete the note before it is read or expires — for example if it was shared by mistake. Store it now: it will not be shown again.",
+        "copy-link": "Copy revocation link",
+        "copy-success": "Revocation link copied"
+      }
     },
     "qr-code": {
       "title": "Share this note on mobile",
@@ -167,5 +172,18 @@
   "copy": {
     "label": "Copy to clipboard",
     "success": "Copied!"
+  },
+  "revoke": {
+    "title": "Revoke note",
+    "description": "This permanently deletes the note. Recipients will no longer be able to open it. This cannot be undone.",
+    "button": "Permanently delete note",
+    "success": {
+      "title": "Note deleted",
+      "description": "The note was permanently deleted and can no longer be opened."
+    },
+    "not-found": {
+      "title": "Note not found",
+      "description": "The note does not exist (anymore), has expired, or the revocation link is invalid."
+    }
   }
 }

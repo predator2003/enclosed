@@ -1,6 +1,6 @@
 {
   "app": {
-    "title": "Enclosed",
+    "title": "WEIN & CO Notes",
     "description": "发送私密、安全的笔记"
   },
   "insecureContextWarning": {
@@ -9,9 +9,7 @@
   },
   "navbar": {
     "new-note": "新建笔记",
-    "github": "GitHub",
     "language": "语言",
-    "github-repository": "GitHub 仓库",
     "documentation": "文档",
     "change-theme": "更改主题",
     "menu-icon": "菜单图标",
@@ -24,22 +22,18 @@
     },
     "settings": {
       "documentation": "文档",
-      "cli": "Enclosed CLI",
-      "support": "支持 Enclosed",
+      "cli": "WEIN & CO Notes CLI",
       "report-bug": "报告错误",
       "logout": "登出",
       "contribute-to-i18n": "贡献翻译"
     }
   },
   "footer": {
-    "crafted-by": "作者：",
-    "source-code": "源代码：",
-    "github": "GitHub",
     "version": "版本"
   },
   "login": {
-    "title": "登录 Enclosed",
-    "description": "这是一个私有的 Enclosed 实例，输入您的凭据以创建笔记。",
+    "title": "登录 WEIN & CO Notes",
+    "description": "这是一个私有的 WEIN & CO Notes 实例，输入您的凭据以创建笔记。",
     "email": "电子邮箱",
     "password": "密码",
     "submit": "登录",
@@ -47,7 +41,10 @@
       "invalid-credentials": "无效的电子邮箱或密码。",
       "unknown": "发生未知错误，稍后再试。"
     },
-    "footer": ["没有账户？", "联系实例的拥有者。"]
+    "footer": [
+      "没有账户？",
+      "联系实例的拥有者。"
+    ]
   },
   "create": {
     "errors": {

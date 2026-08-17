@@ -1,6 +1,6 @@
 {
   "app": {
-    "title": "Enclosed",
+    "title": "WEIN & CO Notes",
     "description": "Kirim catatan pribadi dan aman"
   },
   "insecureContextWarning": {
@@ -9,9 +9,7 @@
   },
   "navbar": {
     "new-note": "Catatan baru",
-    "github": "GitHub",
     "language": "Bahasa",
-    "github-repository": "Repositori GitHub",
     "documentation": "Dokumentasi",
     "change-theme": "Ubah tema",
     "menu-icon": "Ikon menu",
@@ -24,22 +22,18 @@
     },
     "settings": {
       "documentation": "Dokumentasi",
-      "cli": "Enclosed CLI",
-      "support": "Dukung Enclosed",
+      "cli": "WEIN & CO Notes CLI",
       "report-bug": "Laporkan bug",
       "logout": "Keluar",
       "contribute-to-i18n": "Berkontribusi pada i18n"
     }
   },
   "footer": {
-    "crafted-by": "Dibuat oleh",
-    "source-code": "Kode sumber tersedia di",
-    "github": "GitHub",
     "version": "Versi"
   },
   "login": {
-    "title": "Masuk ke Enclosed",
-    "description": "Ini adalah instance pribadi Enclosed. Masukkan kredensial Anda untuk dapat membuat catatan.",
+    "title": "Masuk ke WEIN & CO Notes",
+    "description": "Ini adalah instance pribadi WEIN & CO Notes. Masukkan kredensial Anda untuk dapat membuat catatan.",
     "email": "Email",
     "password": "Kata Sandi",
     "submit": "Masuk",

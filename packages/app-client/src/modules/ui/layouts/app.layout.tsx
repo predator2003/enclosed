@@ -3,13 +3,11 @@ import { buildTimeConfig } from '@/modules/config/config.constants';
 import { getConfig } from '@/modules/config/config.provider';
 import { buildDocUrl } from '@/modules/docs/docs.models';
 import { useI18n } from '@/modules/i18n/i18n.provider';
-import { useNoteContext } from '@/modules/notes/notes.context';
 import { cn } from '@/modules/shared/style/cn';
 import { useThemeStore } from '@/modules/theme/theme.store';
 import { Button } from '@/modules/ui/components/button';
 import { DropdownMenu } from '@kobalte/core/dropdown-menu';
 
-import { A, useNavigate } from '@solidjs/router';
 import { type Component, type ParentComponent, Show } from 'solid-js';
 import { DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from '../components/dropdown-menu';
 
@@ -37,6 +35,7 @@ const ThemeSwitcher: Component = () => {
 
 const LanguageSwitcher: Component = () => {
   const { t, getLocale, setLocale, locales } = useI18n();
+  const config = getConfig();
   const languageName = new Intl.DisplayNames(getLocale(), {
     type: 'language',
     languageDisplay: 'standard',
@@ -59,41 +58,49 @@ const LanguageSwitcher: Component = () => {
         </DropdownMenuItem>
       ))}
 
-      <DropdownMenuSeparator />
+      <Show when={!config.hideExternalLinks}>
+        <DropdownMenuSeparator />
 
-      <DropdownMenuItem as="a" class="flex items-center gap-2 cursor-pointer" target="_blank" rel="noopener noreferrer" href="https://github.com/CorentinTh/enclosed/tree/main/packages/app-client/src/locales">
-        {t('navbar.settings.contribute-to-i18n')}
-        <div class="i-tabler-external-link text-lg text-muted-foreground"></div>
-      </DropdownMenuItem>
+        <DropdownMenuItem as="a" class="flex items-center gap-2 cursor-pointer" target="_blank" rel="noopener noreferrer" href="https://github.com/predator2003/enclosed/tree/main/packages/app-client/src/locales">
+          {t('navbar.settings.contribute-to-i18n')}
+          <div class="i-tabler-external-link text-lg text-muted-foreground"></div>
+        </DropdownMenuItem>
+      </Show>
     </>
   );
 };
 
+// Header icon buttons sit on the brand-red bar and need white icons in both color modes
+const brandBarIconTriggerClass = 'text-lg px-0 size-9 text-[hsl(var(--brand-foreground))] hover:bg-white/15 hover:text-[hsl(var(--brand-foreground))]';
+
 export const Navbar: Component = () => {
   const themeStore = useThemeStore();
-  const { triggerResetNoteForm } = useNoteContext();
-  const navigate = useNavigate();
   const { t } = useI18n();
 
   const config = getConfig();
 
   const newNoteClicked = () => {
-    triggerResetNoteForm();
-    navigate('/');
+    // Full document navigation instead of client-side routing so an authenticating
+    // reverse proxy (Authelia, oauth2-proxy, ...) in front of the instance gets a
+    // request and can challenge the user before the create-note UI loads. The full
+    // reload also resets the note form, so no explicit reset is needed.
+    window.location.assign('/');
   };
 
   // Only show the "New Note" button if the user is authenticated or if authentication is not required
   const getShouldShowNewNoteButton = () => config.isAuthenticationRequired ? authStore.getIsAuthenticated() : true;
 
   return (
-    <div class="border-b border-border bg-surface">
-      <div class="flex items-center justify-between px-6 py-3 mx-auto max-w-1200px">
-        <div class="flex items-baseline gap-4">
-          <Button variant="link" class="text-lg font-semibold border-b border-transparent hover:(no-underline !border-border) h-auto py-0 px-1 ml--1 rounded-none !transition-border-color-250" onClick={newNoteClicked}>
+    <div class="bg-[hsl(var(--brand))] text-[hsl(var(--brand-foreground))]">
+      <div class="flex items-center justify-between px-6 py-4 mx-auto max-w-1200px">
+        <div class="flex items-center gap-4">
+          <img src="/logo.svg" alt="WEIN & CO Logo" class="h-13 w-13 rounded-md shadow-md flex-shrink-0" />
+
+          <Button variant="link" class="text-xl font-semibold text-[hsl(var(--brand-foreground))] border-b border-transparent hover:(no-underline !border-white/60) h-auto py-0 px-1 ml--1 rounded-none !transition-border-color-250" onClick={newNoteClicked}>
             {t('app.title')}
           </Button>
 
-          <span class="text-muted-foreground hidden sm:block">
+          <span class="text-white/75 hidden sm:block">
             {t('app.description')}
           </span>
         </div>
@@ -107,12 +114,8 @@ export const Navbar: Component = () => {
             </Button>
           )}
 
-          <Button variant="ghost" class="text-lg px-0 size-9 hidden md:inline-flex" as={A} href="https://github.com/CorentinTh/enclosed" target="_blank" rel="noopener noreferrer" aria-label={t('navbar.github-repository')}>
-            <div class="i-tabler-brand-github"></div>
-          </Button>
-
           <DropdownMenu>
-            <DropdownMenuTrigger as={Button} class="text-lg px-0 size-9 hidden md:inline-flex" variant="ghost" aria-label={t('navbar.change-theme')}>
+            <DropdownMenuTrigger as={Button} class={`${brandBarIconTriggerClass} hidden md:inline-flex`} variant="ghost" aria-label={t('navbar.change-theme')}>
               <div classList={{ 'i-tabler-moon': themeStore.getColorMode() === 'dark', 'i-tabler-sun': themeStore.getColorMode() === 'light' }}></div>
             </DropdownMenuTrigger>
             <DropdownMenuContent class="w-42">
@@ -121,7 +124,7 @@ export const Navbar: Component = () => {
           </DropdownMenu>
 
           <DropdownMenu>
-            <DropdownMenuTrigger as={Button} class="text-lg px-0 size-9 hidden md:inline-flex" variant="ghost" aria-label={t('navbar.language')}>
+            <DropdownMenuTrigger as={Button} class={`${brandBarIconTriggerClass} hidden md:inline-flex`} variant="ghost" aria-label={t('navbar.language')}>
               <div class="i-custom-language size-4"></div>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
@@ -131,7 +134,7 @@ export const Navbar: Component = () => {
 
           <DropdownMenu>
 
-            <DropdownMenuTrigger as={Button} class="text-lg px-0 size-9" variant="ghost" aria-label={t('navbar.menu-icon')}>
+            <DropdownMenuTrigger as={Button} class={brandBarIconTriggerClass} variant="ghost" aria-label={t('navbar.menu-icon')}>
               <div class="i-tabler-dots-vertical hidden md:block"></div>
               <div class="i-tabler-menu-2 block md:hidden"></div>
             </DropdownMenuTrigger>
@@ -139,11 +142,6 @@ export const Navbar: Component = () => {
             <DropdownMenuContent class="w-46">
 
               {/* Mobile only items */}
-              <DropdownMenuItem as="a" class="flex items-center gap-2 cursor-pointer md:hidden" target="_blank" href="https://github.com/CorentinTh/enclosed" rel="noopener noreferrer">
-                <div class="i-tabler-brand-github text-lg"></div>
-                {t('navbar.github')}
-              </DropdownMenuItem>
-
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger as="a" class="flex items-center gap-2 md:hidden" aria-label={t('navbar.change-theme')}>
                   <div class="text-lg" classList={{ 'i-tabler-moon': themeStore.getColorMode() === 'dark', 'i-tabler-sun': themeStore.getColorMode() === 'light' }}></div>
@@ -167,25 +165,22 @@ export const Navbar: Component = () => {
               </DropdownMenuSub>
 
               {/* Default items */}
-              <DropdownMenuItem as="a" class="flex items-center gap-2 cursor-pointer" target="_blank" href={buildDocUrl({ path: '/' })}>
-                <div class="i-tabler-file-text text-lg"></div>
-                {t('navbar.settings.documentation')}
-              </DropdownMenuItem>
+              <Show when={!config.hideExternalLinks}>
+                <DropdownMenuItem as="a" class="flex items-center gap-2 cursor-pointer" target="_blank" href={buildDocUrl({ path: '/' })}>
+                  <div class="i-tabler-file-text text-lg"></div>
+                  {t('navbar.settings.documentation')}
+                </DropdownMenuItem>
 
-              <DropdownMenuItem as="a" class="flex items-center gap-2 cursor-pointer" target="_blank" href={buildDocUrl({ path: '/integrations/cli' })}>
-                <div class="i-tabler-terminal text-lg"></div>
-                {t('navbar.settings.cli')}
-              </DropdownMenuItem>
+                <DropdownMenuItem as="a" class="flex items-center gap-2 cursor-pointer" target="_blank" href={buildDocUrl({ path: '/integrations/cli' })}>
+                  <div class="i-tabler-terminal text-lg"></div>
+                  {t('navbar.settings.cli')}
+                </DropdownMenuItem>
 
-              <DropdownMenuItem as="a" class="flex items-center gap-2 cursor-pointer" target="_blank" href="https://github.com/CorentinTh/enclosed/issues/new/choose" rel="noopener noreferrer">
-                <div class="i-tabler-bug text-lg"></div>
-                {t('navbar.settings.report-bug')}
-              </DropdownMenuItem>
-
-              <DropdownMenuItem as="a" class="flex items-center gap-2 cursor-pointer" target="_blank" href="https://buymeacoffee.com/cthmsst" rel="noopener noreferrer">
-                <div class="i-tabler-pig-money text-lg"></div>
-                {t('navbar.settings.support')}
-              </DropdownMenuItem>
+                <DropdownMenuItem as="a" class="flex items-center gap-2 cursor-pointer" target="_blank" href="https://github.com/predator2003/enclosed/issues/new" rel="noopener noreferrer">
+                  <div class="i-tabler-bug text-lg"></div>
+                  {t('navbar.settings.report-bug')}
+                </DropdownMenuItem>
+              </Show>
 
               {config.isAuthenticationRequired && authStore.getIsAuthenticated() && (
                 <>
@@ -206,33 +201,49 @@ export const Navbar: Component = () => {
   );
 };
 
+const footerLinkClass = 'p-0 text-muted-foreground underline hover:text-primary transition font-normal h-auto';
+
 export const Footer: Component = () => {
   const { t } = useI18n();
+  const config = getConfig();
 
   return (
-    <div class="bg-surface border-t border-border py-6 px-6 text-center text-muted-foreground flex flex-col sm:flex-row items-center justify-center gap-1">
+    <div class="bg-secondary border-t border-border py-6 px-6 text-center text-muted-foreground flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-4">
       <div>
-        {t('footer.crafted-by')}
+        ©
         {' '}
-        <Button variant="link" as="a" href="https://corentin.tech" target="_blank" class="p-0 text-muted-foreground underline hover:text-primary transition font-normal h-auto">Corentin Thomasset</Button>
-        .
-      </div>
-      <div>
-        {t('footer.source-code')}
+        {new Date().getFullYear()}
         {' '}
-        <Button variant="link" as="a" href="https://github.com/CorentinTh/enclosed" target="_blank" class="p-0 text-muted-foreground underline hover:text-primary transition font-normal h-auto">{t('footer.github')}</Button>
-        .
+        <Button variant="link" as="a" href="https://www.weinco.at" target="_blank" rel="noopener noreferrer" class={footerLinkClass}>WEIN & CO Handelsgesellschaft m.b.H.</Button>
       </div>
 
       <div>
-        {t('footer.version')}
-        {' '}
-        <Button variant="link" as="a" href={`https://github.com/CorentinTh/enclosed/tree/v${buildTimeConfig.enclosedVersion}`} target="_blank" class="p-0 text-muted-foreground underline hover:text-primary transition font-normal h-auto">
-          v
-          {buildTimeConfig.enclosedVersion}
-        </Button>
-
+        <Button variant="link" as="a" href="https://www.weinco.at/footer/information/impressum" target="_blank" rel="noopener noreferrer" class={footerLinkClass}>{t('footer.imprint')}</Button>
       </div>
+
+      <div>
+        <Button variant="link" as="a" href="https://www.weinco.at/datenschutz" target="_blank" rel="noopener noreferrer" class={footerLinkClass}>{t('footer.privacy')}</Button>
+      </div>
+
+      <div>
+        Powered by
+        {' '}
+        <Button variant="link" as="a" href="https://github.com/CorentinTh/enclosed" target="_blank" rel="noopener noreferrer" class={footerLinkClass}>Enclosed</Button>
+        {' '}
+        (Apache 2.0)
+      </div>
+
+      <Show when={!config.hideFooterVersion}>
+        <div>
+          {t('footer.version')}
+          {' '}
+          <Button variant="link" as="a" href={`https://github.com/predator2003/enclosed/tree/v${buildTimeConfig.enclosedVersion}`} target="_blank" rel="noopener noreferrer" class={footerLinkClass}>
+            v
+            {buildTimeConfig.enclosedVersion}
+          </Button>
+
+        </div>
+      </Show>
     </div>
   );
 };

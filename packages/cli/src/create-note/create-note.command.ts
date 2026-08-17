@@ -91,7 +91,7 @@ export const createNoteCommand = defineCommand({
     try {
       const { assets } = await buildFileAssets({ filePaths });
 
-      const { noteUrl } = await createNote({
+      const { noteUrl, noteId, revocationToken } = await createNote({
         content: content ?? '',
         password,
         deleteAfterReading,
@@ -103,6 +103,11 @@ export const createNoteCommand = defineCommand({
       spinner.succeed('Note created successfully');
 
       console.log(`\nNote url: ${pc.green(noteUrl)}`);
+
+      if (revocationToken) {
+        const revocationUrl = new URL(`/revoke/${noteId}#${revocationToken}`, getInstanceUrl()).toString();
+        console.log(`Revocation url (deletes the note before it is read): ${pc.dim(revocationUrl)}`);
+      }
     } catch (error) {
       spinner.fail('Failed to create note');
 

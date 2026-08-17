@@ -4,7 +4,7 @@ import { buildUrl, getBody } from './http-client.models';
 
 export { apiClient };
 
-async function apiClient<T>({ path, method, body }: { path: string; method: string; body?: unknown }): Promise<T> {
+async function apiClient<T>({ path, method, body, keepalive }: { path: string; method: string; body?: unknown; keepalive?: boolean }): Promise<T> {
   const config = getConfig();
   const url = buildUrl({ path, baseUrl: config.baseApiUrl });
 
@@ -12,6 +12,7 @@ async function apiClient<T>({ path, method, body }: { path: string; method: stri
 
   const response = await fetch(url, {
     method,
+    keepalive,
     headers: {
       'Content-Type': 'application/json',
       ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),

@@ -1,0 +1,33 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: enclosed
+  namespace: enclosed
+  labels:
+    app.kubernetes.io/name: enclosed
+  annotations:
+    # HTTPS is REQUIRED: the client-side encryption uses the WebCrypto API,
+    # which browsers only expose in secure contexts.
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    # Must be >= NOTES_MAX_ENCRYPTED_PAYLOAD_LENGTH (50 MiB default) plus headroom,
+    # otherwise large notes/files fail at the ingress before reaching the app.
+    nginx.ingress.kubernetes.io/proxy-body-size: 64m
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - notes.example.com
+      secretName: enclosed-tls
+  rules:
+    - host: notes.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: enclosed
+                port:
+                  name: http

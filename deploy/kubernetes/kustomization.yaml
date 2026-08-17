@@ -1,0 +1,17 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - namespace.yaml
+  - configmap.yaml
+  # Copy secret.example.yaml to secret.yaml, fill in real values first:
+  # - secret.yaml
+  - pvc.yaml
+  - deployment.yaml
+  - service.yaml
+  - ingress.yaml
+
+# Override the image in one place, e.g.:
+# images:
+#   - name: ghcr.io/predator2003/enclosed
+#     newTag: v1.16.0-weinco

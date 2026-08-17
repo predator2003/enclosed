@@ -1,6 +1,6 @@
 {
   "app": {
-    "title": "Enclosed",
+    "title": "WEIN & CO Notes",
     "description": "Gizli ve güvenli notlar gönderin"
   },
   "insecureContextWarning": {
@@ -9,9 +9,7 @@
   },
   "navbar": {
     "new-note": "Yeni not",
-    "github": "GitHub",
     "language": "Dil",
-    "github-repository": "GitHub deposu",
     "documentation": "Dokümantasyon",
     "change-theme": "Temayı değiştir",
     "menu-icon": "Menü simgesi",
@@ -24,22 +22,18 @@
     },
     "settings": {
       "documentation": "Dokümantasyon",
-      "cli": "Enclosed CLI",
-      "support": "Enclosed’a destek olun",
+      "cli": "WEIN & CO Notes CLI",
       "report-bug": "Hata bildir",
       "logout": "Çıkış yap",
       "contribute-to-i18n": "i18n’ye katkıda bulunun"
     }
   },
   "footer": {
-    "crafted-by": "Hazırlayan",
-    "source-code": "Kaynak kodu",
-    "github": "GitHub",
     "version": "Sürüm"
   },
   "login": {
-    "title": "Enclosed’a giriş yapın",
-    "description": "Bu, Enclosed’un özel bir sürümüdür. Not oluşturabilmek için kimlik bilgilerinizi girin.",
+    "title": "WEIN & CO Notes’a giriş yapın",
+    "description": "Bu, WEIN & CO Notes’un özel bir sürümüdür. Not oluşturabilmek için kimlik bilgilerinizi girin.",
     "email": "E-posta",
     "password": "Şifre",
     "submit": "Giriş yap",
@@ -47,7 +41,10 @@
       "invalid-credentials": "Geçersiz e-posta veya şifre.",
       "unknown": "Bilinmeyen bir hata oluştu. Lütfen daha sonra tekrar deneyin."
     },
-    "footer": ["Hesabınız yok mu?", "Bu sistemin sahibine ulaşın."]
+    "footer": [
+      "Hesabınız yok mu?",
+      "Bu sistemin sahibine ulaşın."
+    ]
   },
   "create": {
     "errors": {

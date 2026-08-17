@@ -1,6 +1,6 @@
 {
   "app": {
-    "title": "Enclosed",
+    "title": "WEIN & CO Notes",
     "description": "Gửi ghi chú riêng tư và bảo mật"
   },
   "insecureContextWarning": {
@@ -9,9 +9,7 @@
   },
   "navbar": {
     "new-note": "Ghi chú mới",
-    "github": "GitHub",
     "language": "Ngôn ngữ",
-    "github-repository": "Kho lưu trữ GitHub",
     "documentation": "Tài liệu",
     "change-theme": "Thay đổi giao diện",
     "menu-icon": "Biểu tượng menu",
@@ -24,22 +22,18 @@
     },
     "settings": {
       "documentation": "Tài liệu",
-      "cli": "Enclosed CLI",
-      "support": "Hỗ trợ Enclosed",
+      "cli": "WEIN & CO Notes CLI",
       "report-bug": "Báo cáo lỗi",
       "logout": "Đăng xuất",
       "contribute-to-i18n": "Đóng góp dịch thuật"
     }
   },
   "footer": {
-    "crafted-by": "Được tạo bởi",
-    "source-code": "Mã nguồn có sẵn trên",
-    "github": "GitHub",
     "version": "Phiên bản"
   },
   "login": {
-    "title": "Đăng nhập Enclosed",
-    "description": "Đây là một phiên bản riêng tư của Enclosed. Nhập thông tin đăng nhập của bạn để có thể tạo ghi chú.",
+    "title": "Đăng nhập WEIN & CO Notes",
+    "description": "Đây là một phiên bản riêng tư của WEIN & CO Notes. Nhập thông tin đăng nhập của bạn để có thể tạo ghi chú.",
     "email": "Email",
     "password": "Mật khẩu",
     "submit": "Đăng nhập",

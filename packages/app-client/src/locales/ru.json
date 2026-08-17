@@ -1,6 +1,6 @@
 {
   "app": {
-    "title": "Enclosed",
+    "title": "WEIN & CO Notes",
     "description": "Отправляйте приватные и защищенные заметки"
   },
   "insecureContextWarning": {
@@ -9,7 +9,6 @@
   },
   "navbar": {
     "new-note": "Новая заметка",
-    "github": "GitHub",
     "theme": {
       "light-mode": "Светлая тема",
       "dark-mode": "Тёмная тема",
@@ -17,22 +16,18 @@
     },
     "settings": {
       "documentation": "Документация",
-      "cli": "Enclosed CLI",
-      "support": "Поддержать Enclosed",
+      "cli": "WEIN & CO Notes CLI",
       "report-bug": "Сообщить об ошибке",
       "logout": "Выйти",
       "contribute-to-i18n": "Внести свой вклад в i18n"
     }
   },
   "footer": {
-    "crafted-by": "Разработано",
-    "source-code": "Исходный код здесь:",
-    "github": "GitHub",
     "version": "Версия"
   },
   "login": {
-    "title": "Войти в Enclosed",
-    "description": "Это приватный режим Enclosed. Введите учётные данные, чтобы создать заметку.",
+    "title": "Войти в WEIN & CO Notes",
+    "description": "Это приватный режим WEIN & CO Notes. Введите учётные данные, чтобы создать заметку.",
     "email": "Электронная почта",
     "password": "Пароль",
     "submit": "Логин",

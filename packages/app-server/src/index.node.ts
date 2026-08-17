@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { createServer as createHttpsServer } from 'node:https';
 import process, { env } from 'node:process';
@@ -5,8 +6,8 @@ import { safelySync } from '@corentinth/chisels';
 import { serve } from '@hono/node-server';
 import { serveStatic } from '@hono/node-server/serve-static';
 import { memoize } from 'lodash-es';
-import { getConfig } from './modules/app/config/config';
-import { injectPublicConfigInIndex } from './modules/app/config/config.models';
+import { DEFAULT_JWT_SECRET, getConfig } from './modules/app/config/config';
+import { getPublicConfig, injectPublicConfigInIndex } from './modules/app/config/config.models';
 import { createServer } from './modules/app/server';
 import { deleteExpiredNotesTask } from './modules/notes/tasks/delete-expired-notes.tasks';
 import { createLogger } from './modules/shared/logger/logger';
@@ -15,11 +16,42 @@ import { createTaskScheduler } from './modules/tasks/task-scheduler';
 
 const logger = createLogger({ namespace: 'app-server' });
 
+// Docker/Kubernetes secrets are usually mounted as files; the _FILE variants let
+// operators keep secrets out of the environment (upstream issue #426). The file
+// content only fills the variable when the direct variable is not already set.
+for (const name of ['AUTHENTICATION_JWT_SECRET', 'AUTHENTICATION_USERS']) {
+  const filePath = env[`${name}_FILE`];
+
+  if (filePath && !env[name]) {
+    const [content, readError] = safelySync(() => readFileSync(filePath, 'utf-8').trim());
+
+    if (readError) {
+      logger.error({ error: readError, filePath }, `Cannot read ${name}_FILE`);
+      process.exit(1);
+    }
+
+    env[name] = content;
+  }
+}
+
 const [config, configError] = safelySync(() => getConfig({ env }));
 
 if (configError) {
   logger.error({ error: configError }, `Invalid config: ${configError.message}`);
   process.exit(1);
+}
+
+// With the default JWT secret anyone can forge authentication tokens, so a private
+// instance must not start with it (https://github.com/CorentinTh/enclosed/issues/445).
+if (config.authentication.jwtSecret === DEFAULT_JWT_SECRET) {
+  if (config.public.isAuthenticationRequired) {
+    logger.error('AUTHENTICATION_JWT_SECRET is still the default value while authentication is required, which would allow anyone to forge valid session tokens. Set a strong secret (e.g. `openssl rand -base64 48`) and restart.');
+    process.exit(1);
+  }
+
+  if (config.authentication.authUsers.length > 0) {
+    logger.warn('AUTHENTICATION_USERS is configured but AUTHENTICATION_JWT_SECRET is still the default value. Set a strong secret before enabling authentication.');
+  }
 }
 
 const { storage } = createFsLiteStorage({ config });
@@ -47,7 +79,7 @@ app
         return next();
       }
 
-      const { public: publicConfig } = context.get('config');
+      const { publicConfig } = getPublicConfig({ config: context.get('config') });
 
       const indexHtmlContent = await getIndexContent();
       const indexWithConfig = injectPublicConfigInIndex({ publicConfig, indexHtmlContent });
