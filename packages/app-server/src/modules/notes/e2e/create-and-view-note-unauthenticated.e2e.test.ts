@@ -92,6 +92,53 @@ describe('e2e', () => {
       expect(fetchAfterConfirmResponse.status).to.eql(404);
     });
 
+    test('a note can be revoked with the token from the create response, but not with a wrong token', async () => {
+      const { storage } = createMemoryStorage();
+
+      const { app } = createServer({
+        storageFactory: () => ({ storage }),
+      });
+
+      const createNoteResponse = await app.request(
+        '/api/notes',
+        {
+          method: 'POST',
+          body: JSON.stringify({
+            payload: '<encrypted-content>',
+            deleteAfterReading: false,
+            ttlInSeconds: 600,
+            encryptionAlgorithm: 'aes-256-gcm',
+            serializationFormat: 'cbor-array',
+          }),
+          headers: new Headers({ 'Content-Type': 'application/json' }),
+        },
+      );
+
+      const { noteId, revocationToken } = await createNoteResponse.json<any>();
+
+      expect(revocationToken).to.be.a('string');
+      // The stored note must never contain the plain token
+      expect(JSON.stringify(await storage.getItem(noteId))).not.to.include(revocationToken);
+
+      const wrongTokenResponse = await app.request(`/api/notes/${noteId}/revoke`, {
+        method: 'POST',
+        body: JSON.stringify({ revocationToken: 'wrong-token' }),
+        headers: new Headers({ 'Content-Type': 'application/json' }),
+      });
+      expect(wrongTokenResponse.status).to.eql(404);
+      expect((await app.request(`/api/notes/${noteId}`)).status).to.eql(200);
+
+      const revokeResponse = await app.request(`/api/notes/${noteId}/revoke`, {
+        method: 'POST',
+        body: JSON.stringify({ revocationToken }),
+        headers: new Headers({ 'Content-Type': 'application/json' }),
+      });
+      expect(revokeResponse.status).to.eql(200);
+      expect(await revokeResponse.json()).to.eql({ revoked: true });
+
+      expect((await app.request(`/api/notes/${noteId}`)).status).to.eql(404);
+    });
+
     test('confirming the read of a note that is not delete-after-reading does not delete it', async () => {
       const { storage } = createMemoryStorage();
 

@@ -4,6 +4,7 @@ import { getConfig } from './modules/config/config.provider';
 import { NOTE_ID_REGEX } from './modules/notes/notes.constants';
 import { buildViewNotePagePath } from './modules/notes/notes.models';
 import { CreateNotePage } from './modules/notes/pages/create-note.page';
+import { RevokeNotePage } from './modules/notes/pages/revoke-note.page';
 import { ViewNotePage } from './modules/notes/pages/view-note.page';
 import { Button } from './modules/ui/components/button';
 import { AppLayout } from './modules/ui/layouts/app.layout';
@@ -25,6 +26,13 @@ export function getRoutes(): RouteDefinition[] {
         {
           path: viewNotePath,
           component: ViewNotePage,
+          matchFilters: {
+            noteId: NOTE_ID_REGEX,
+          },
+        },
+        {
+          path: '/revoke/:noteId',
+          component: RevokeNotePage,
           matchFilters: {
             noteId: NOTE_ID_REGEX,
           },

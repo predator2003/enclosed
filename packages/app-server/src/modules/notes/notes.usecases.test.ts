@@ -1,8 +1,9 @@
 import { describe, expect, test } from 'vitest';
+import { sha256Hex } from '../shared/utils/crypto';
 import { createMemoryStorage } from '../storage/factories/memory.storage';
 import { createNoteNotFoundError } from './notes.errors';
 import { createNoteRepository } from './notes.repository';
-import { confirmNoteRead, getRefreshedNote } from './notes.usecases';
+import { confirmNoteRead, getRefreshedNote, revokeNote } from './notes.usecases';
 
 describe('notes usecases', () => {
   describe('getRefreshedNote', () => {
@@ -147,6 +148,75 @@ describe('notes usecases', () => {
       await expect(
         confirmNoteRead({
           noteId: 'unknown-note',
+          notesRepository: createNoteRepository({ storage }),
+        }),
+      ).rejects.toThrow(createNoteNotFoundError());
+    });
+  });
+
+  describe('revokeNote', () => {
+    test('a note is deleted when the correct revocation token is provided', async () => {
+      const { storage } = createMemoryStorage();
+
+      storage.setItem('note-1', {
+        content: '<encrypted-content>',
+        deleteAfterReading: false,
+        revocationTokenHash: await sha256Hex('my-secret-token'),
+      });
+
+      const { revoked } = await revokeNote({
+        noteId: 'note-1',
+        revocationToken: 'my-secret-token',
+        notesRepository: createNoteRepository({ storage }),
+      });
+
+      expect(revoked).to.eql(true);
+
+      await expect(
+        getRefreshedNote({
+          noteId: 'note-1',
+          notesRepository: createNoteRepository({ storage }),
+        }),
+      ).rejects.toThrow(createNoteNotFoundError());
+    });
+
+    test('a wrong revocation token answers with not-found and keeps the note, indistinguishable from a missing note', async () => {
+      const { storage } = createMemoryStorage();
+
+      storage.setItem('note-1', {
+        content: '<encrypted-content>',
+        deleteAfterReading: false,
+        revocationTokenHash: await sha256Hex('my-secret-token'),
+      });
+
+      await expect(
+        revokeNote({
+          noteId: 'note-1',
+          revocationToken: 'wrong-token',
+          notesRepository: createNoteRepository({ storage }),
+        }),
+      ).rejects.toThrow(createNoteNotFoundError());
+
+      const { note } = await getRefreshedNote({
+        noteId: 'note-1',
+        notesRepository: createNoteRepository({ storage }),
+      });
+
+      expect(note.deleteAfterReading).to.eql(false);
+    });
+
+    test('a note without a stored revocation token hash (created before this feature) cannot be revoked', async () => {
+      const { storage } = createMemoryStorage();
+
+      storage.setItem('note-1', {
+        content: '<encrypted-content>',
+        deleteAfterReading: false,
+      });
+
+      await expect(
+        revokeNote({
+          noteId: 'note-1',
+          revocationToken: 'anything',
           notesRepository: createNoteRepository({ storage }),
         }),
       ).rejects.toThrow(createNoteNotFoundError());

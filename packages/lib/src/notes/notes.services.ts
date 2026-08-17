@@ -18,8 +18,8 @@ async function storeNote({
   serializationFormat: string;
   encryptionAlgorithm: string;
   isPublic?: boolean;
-}): Promise<{ noteId: string }> {
-  const { noteId } = await apiClient<{ noteId: string }>({
+}): Promise<{ noteId: string; revocationToken?: string }> {
+  const { noteId, revocationToken } = await apiClient<{ noteId: string; revocationToken?: string }>({
     path: 'api/notes',
     baseUrl: apiBaseUrl,
     method: 'POST',
@@ -33,7 +33,7 @@ async function storeNote({
     },
   });
 
-  return { noteId };
+  return { noteId, revocationToken };
 }
 
 async function confirmNoteRead({

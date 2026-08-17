@@ -115,6 +115,7 @@ export const CreateNotePage: Component = () => {
   const [getContent, setContent] = createSignal('');
   const [getPassword, setPassword] = createSignal('');
   const [getNoteUrl, setNoteUrl] = createSignal('');
+  const [getRevocationUrl, setRevocationUrl] = createSignal('');
   const [getError, setError] = createSignal<{ message: string; details?: string } | null>(null);
   const [getIsNoteCreated, setIsNoteCreated] = createSignal(false);
   const [getIsPublic, setIsPublic] = createSignal(true);
@@ -137,6 +138,7 @@ export const CreateNotePage: Component = () => {
     setContent('');
     setPassword('');
     setNoteUrl('');
+    setRevocationUrl('');
     setError(null);
     setIsPublic(true);
     setIsNoteCreated(false);
@@ -190,9 +192,11 @@ export const CreateNotePage: Component = () => {
     setUploadPercent(0);
 
     if (!error) {
-      const { noteUrl } = createdNote;
+      const { noteUrl, noteId, revocationToken } = createdNote;
 
       setNoteUrl(noteUrl);
+      // The token goes into the hash fragment so it never reaches server logs
+      setRevocationUrl(revocationToken ? `${window.location.origin}/revoke/${noteId}#${revocationToken}` : '');
       setIsNoteCreated(true);
       return;
     }
@@ -429,6 +433,28 @@ export const CreateNotePage: Component = () => {
                 </Button>
               </Show>
             </div>
+
+            <Show when={getRevocationUrl()}>
+              <Card class="max-w-500px w-full mx-auto mt-6">
+                <CardHeader>
+                  <div class="text-sm font-semibold">
+                    {t('create.success.revocation.title')}
+                  </div>
+                  <div class="text-muted-foreground">
+                    {t('create.success.revocation.description')}
+                  </div>
+                  <div class="mt-2">
+                    <CopyButton
+                      variant="secondary"
+                      class="w-full sm:w-auto"
+                      text={getRevocationUrl()}
+                      label={t('create.success.revocation.copy-link')}
+                      copiedLabel={t('create.success.revocation.copy-success')}
+                    />
+                  </div>
+                </CardHeader>
+              </Card>
+            </Show>
 
             <QrCodeCard noteUrl={getNoteUrl()} />
           </div>

@@ -99,7 +99,13 @@
       "description": "Your note has been created. You can now share it using the following link.",
       "with-deletion": "The note will be deleted after reading.",
       "copy-link": "Copy link",
-      "copy-success": "Link copied"
+      "copy-success": "Link copied",
+      "revocation": {
+        "title": "Revocation link",
+        "description": "With this link you can permanently delete the note before it is read or expires — for example if it was shared by mistake. Store it now: it will not be shown again.",
+        "copy-link": "Copy revocation link",
+        "copy-success": "Revocation link copied"
+      }
     },
     "qr-code": {
       "title": "Share this note on mobile",
@@ -166,5 +172,18 @@
   "copy": {
     "label": "Copy to clipboard",
     "success": "Copied!"
+  },
+  "revoke": {
+    "title": "Revoke note",
+    "description": "This permanently deletes the note. Recipients will no longer be able to open it. This cannot be undone.",
+    "button": "Permanently delete note",
+    "success": {
+      "title": "Note deleted",
+      "description": "The note was permanently deleted and can no longer be opened."
+    },
+    "not-found": {
+      "title": "Note not found",
+      "description": "The note does not exist (anymore), has expired, or the revocation link is invalid."
+    }
   }
 }

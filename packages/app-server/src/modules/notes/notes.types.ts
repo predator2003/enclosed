@@ -10,6 +10,9 @@ export type DatabaseNote = {
   expirationDate?: string;
   deleteAfterReading: boolean;
   isPublic: boolean;
+  // Only the SHA-256 hash of the revocation token is stored; the token itself
+  // is returned once at creation time
+  revocationTokenHash?: string;
 
   // compressionAlgorithm: string
   // keyDerivationAlgorithm: string;

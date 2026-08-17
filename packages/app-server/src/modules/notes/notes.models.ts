@@ -14,7 +14,7 @@ function isNoteExpired({ note, now = new Date() }: { note: { expirationDate?: Da
 
 function formatNoteForApi({ note }: { note: Note }) {
   return {
-    apiNote: omit(note, ['expirationDate', 'deleteAfterReading', 'isPublic']),
+    apiNote: omit(note, ['expirationDate', 'deleteAfterReading', 'isPublic', 'revocationTokenHash']),
   };
 }
 

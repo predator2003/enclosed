@@ -5,12 +5,13 @@ import { isNil } from 'lodash-es';
 import { z } from 'zod';
 import { createUnauthorizedError } from '../app/auth/auth.errors';
 import { protectedRouteMiddleware } from '../app/auth/auth.middleware';
+import { generateToken, sha256Hex } from '../shared/utils/crypto';
 import { validateJsonBody } from '../shared/validation/validation';
 import { ONE_MONTH_IN_SECONDS, TEN_MINUTES_IN_SECONDS } from './notes.constants';
 import { createCannotCreatePrivateNoteOnPublicInstanceError, createExpirationDelayRequiredError, createNotePayloadTooLargeError } from './notes.errors';
 import { formatNoteForApi } from './notes.models';
 import { createNoteRepository } from './notes.repository';
-import { confirmNoteRead, getRefreshedNote } from './notes.usecases';
+import { confirmNoteRead, getRefreshedNote, revokeNote } from './notes.usecases';
 
 export { registerNotesRoutes };
 
@@ -19,6 +20,7 @@ function registerNotesRoutes({ app }: { app: ServerInstance }) {
   setupGetNoteExistsRoute({ app });
   setupCreateNoteRoute({ app });
   setupConfirmNoteReadRoute({ app });
+  setupRevokeNoteRoute({ app });
 }
 
 // On instances with authentication enabled, non-public notes may only be accessed by
@@ -158,9 +160,38 @@ function setupCreateNoteRoute({ app }: { app: ServerInstance }) {
 
       const notesRepository = createNoteRepository({ storage });
 
-      const { noteId } = await notesRepository.saveNote({ payload, ttlInSeconds, deleteAfterReading, encryptionAlgorithm, serializationFormat, isPublic });
+      // The revocation token lets the sender delete the note before it is read
+      // (upstream issue #453). Only its hash is stored; the token itself is
+      // returned exactly once, here.
+      const revocationToken = generateToken();
+      const revocationTokenHash = await sha256Hex(revocationToken);
 
-      return context.json({ noteId });
+      const { noteId } = await notesRepository.saveNote({ payload, ttlInSeconds, deleteAfterReading, encryptionAlgorithm, serializationFormat, isPublic, revocationTokenHash });
+
+      return context.json({ noteId, revocationToken });
+    },
+  );
+}
+
+function setupRevokeNoteRoute({ app }: { app: ServerInstance }) {
+  app.post(
+    '/api/notes/:noteId/revoke',
+    validateJsonBody(
+      z.object({
+        revocationToken: z.string().min(1),
+      }),
+    ),
+
+    async (context) => {
+      const { noteId } = context.req.param();
+      const { revocationToken } = context.req.valid('json');
+
+      const storage = context.get('storage');
+      const notesRepository = createNoteRepository({ storage });
+
+      const { revoked } = await revokeNote({ noteId, revocationToken, notesRepository });
+
+      return context.json({ revoked });
     },
   );
 }

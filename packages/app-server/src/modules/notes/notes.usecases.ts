@@ -1,10 +1,11 @@
 import type { NotesRepository } from './notes.types';
 import { isNil } from 'lodash-es';
+import { sha256Hex } from '../shared/utils/crypto';
 import { ONE_DAY_IN_SECONDS } from './notes.constants';
 import { createNoteNotFoundError } from './notes.errors';
 import { isNoteExpired } from './notes.models';
 
-export { confirmNoteRead, DELETE_AFTER_READING_FALLBACK_TTL_SECONDS, getRefreshedNote };
+export { confirmNoteRead, DELETE_AFTER_READING_FALLBACK_TTL_SECONDS, getRefreshedNote, revokeNote };
 
 // Backstop for readers that fetch a delete-after-reading note but never confirm
 // (old clients, plain curl): once fetched, a note without expiration gets one so
@@ -40,6 +41,30 @@ async function getRefreshedNote({
   return {
     note,
   };
+}
+
+async function revokeNote({
+  noteId,
+  revocationToken,
+  notesRepository,
+}: {
+  noteId: string;
+  revocationToken: string;
+  notesRepository: NotesRepository;
+}) {
+  const { note } = await notesRepository.getNoteById({ noteId });
+
+  const tokenHash = await sha256Hex(revocationToken);
+
+  // A wrong token answers exactly like a missing note so the endpoint neither
+  // leaks note existence nor gives feedback for token guessing.
+  if (!note.revocationTokenHash || note.revocationTokenHash !== tokenHash) {
+    throw createNoteNotFoundError();
+  }
+
+  await notesRepository.deleteNoteById({ noteId });
+
+  return { revoked: true };
 }
 
 async function confirmNoteRead({

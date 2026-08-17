@@ -42,6 +42,7 @@ async function saveNote(
     encryptionAlgorithm,
     serializationFormat,
     isPublic,
+    revocationTokenHash,
   }:
   {
     payload: string;
@@ -53,6 +54,7 @@ async function saveNote(
     encryptionAlgorithm: string;
     serializationFormat: string;
     isPublic: boolean;
+    revocationTokenHash?: string;
   },
 ): Promise<{ noteId: string }> {
   try {
@@ -63,6 +65,7 @@ async function saveNote(
       encryptionAlgorithm,
       serializationFormat,
       isPublic,
+      ...(revocationTokenHash ? { revocationTokenHash } : {}),
     };
 
     if (!ttlInSeconds) {

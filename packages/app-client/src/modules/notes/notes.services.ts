@@ -3,7 +3,7 @@ import { getConfig } from '../config/config.provider';
 import { apiClient } from '../shared/http/http-client';
 import { buildUrl } from '../shared/http/http-client.models';
 
-export { confirmNoteRead, fetchNoteById, fetchNoteExists, storeNote };
+export { confirmNoteRead, fetchNoteById, fetchNoteExists, revokeNote, storeNote };
 
 // The note payload is sent via XHR instead of fetch because fetch cannot report
 // upload progress (upstream issue #437). Error objects carry the same
@@ -29,7 +29,7 @@ async function storeNote({
   const url = buildUrl({ path: '/api/notes', baseUrl: config.baseApiUrl });
   const accessToken = authStore.getAccessToken();
 
-  const { noteId } = await new Promise<{ noteId: string }>((resolve, reject) => {
+  const { noteId, revocationToken } = await new Promise<{ noteId: string; revocationToken?: string }>((resolve, reject) => {
     const xhr = new XMLHttpRequest();
 
     xhr.open('POST', url);
@@ -76,7 +76,17 @@ async function storeNote({
     }));
   });
 
-  return { noteId };
+  return { noteId, revocationToken };
+}
+
+async function revokeNote({ noteId, revocationToken }: { noteId: string; revocationToken: string }) {
+  const { revoked } = await apiClient<{ revoked: boolean }>({
+    path: `/api/notes/${noteId}/revoke`,
+    method: 'POST',
+    body: { revocationToken },
+  });
+
+  return { revoked };
 }
 
 async function fetchNoteById({ noteId }: { noteId: string }) {

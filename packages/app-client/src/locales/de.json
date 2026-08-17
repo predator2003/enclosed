@@ -99,7 +99,13 @@
       "description": "Ihre Notiz wurde erstellt. Sie können sie nun über den folgenden Link teilen.",
       "with-deletion": "Die Notiz wird nach dem Lesen automatisch gelöscht.",
       "copy-link": "Link kopieren",
-      "copy-success": "Der Link wurde kopiert"
+      "copy-success": "Der Link wurde kopiert",
+      "revocation": {
+        "title": "Widerrufs-Link",
+        "description": "Mit diesem Link können Sie die Notiz endgültig löschen, bevor sie gelesen wird oder abläuft — etwa wenn sie versehentlich geteilt wurde. Bewahren Sie ihn jetzt auf: Er wird nicht erneut angezeigt.",
+        "copy-link": "Widerrufs-Link kopieren",
+        "copy-success": "Widerrufs-Link kopiert"
+      }
     },
     "qr-code": {
       "title": "Notiz am Mobilgerät teilen",
@@ -166,5 +172,18 @@
   "copy": {
     "label": "In die Zwischenablage kopieren",
     "success": "Kopiert!"
+  },
+  "revoke": {
+    "title": "Notiz widerrufen",
+    "description": "Dadurch wird die Notiz endgültig gelöscht. Empfänger können sie danach nicht mehr öffnen. Dies kann nicht rückgängig gemacht werden.",
+    "button": "Notiz endgültig löschen",
+    "success": {
+      "title": "Notiz gelöscht",
+      "description": "Die Notiz wurde endgültig gelöscht und kann nicht mehr geöffnet werden."
+    },
+    "not-found": {
+      "title": "Notiz nicht gefunden",
+      "description": "Die Notiz existiert nicht (mehr), ist abgelaufen oder der Widerrufs-Link ist ungültig."
+    }
   }
 }
