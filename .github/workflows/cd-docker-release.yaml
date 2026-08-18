@@ -37,7 +37,7 @@ permissions:
 jobs:
   publish-crypto:
     name: Publish @enclosed/crypto to npm
-    if: ${{ github.event.inputs.publish_lib || github.event_name == 'push' }}
+    if: ${{ inputs.publish_lib || github.event_name == 'push' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -71,7 +71,7 @@ jobs:
 
   publish-lib:
     name: Publish @enclosed/lib to npm
-    if: ${{ github.event.inputs.publish_lib || github.event_name == 'push' }}
+    if: ${{ inputs.publish_lib || github.event_name == 'push' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -104,7 +104,7 @@ jobs:
 
   publish-cli:
     name: Publish @enclosed/cli to npm
-    if: ${{ github.event.inputs.publish_cli || github.event_name == 'push' }}
+    if: ${{ inputs.publish_cli || github.event_name == 'push' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -137,7 +137,7 @@ jobs:
 
   docker-release:
     name: Release Docker images
-    if: ${{ github.event.inputs.release_docker || github.event_name == 'push'}}
+    if: ${{ inputs.release_docker || github.event_name == 'push' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -151,7 +151,14 @@ jobs:
         if: ${{ github.event_name == 'workflow_dispatch' }}
         env:
           RELEASE_VERSION_INPUT: ${{ github.event.inputs.release_version }}
-        run: echo "RELEASE_VERSION=${RELEASE_VERSION_INPUT}" >> $GITHUB_ENV
+        # The value is validated before it reaches GITHUB_ENV: a multi-line input
+        # would otherwise append arbitrary variables to the job environment.
+        run: |
+          if [[ ! "$RELEASE_VERSION_INPUT" =~ ^[0-9]+\.[0-9]+\.[0-9]+([-.][0-9A-Za-z]+)*$ ]]; then
+            echo "::error::Invalid release_version: $RELEASE_VERSION_INPUT"
+            exit 1
+          fi
+          echo "RELEASE_VERSION=$RELEASE_VERSION_INPUT" >> "$GITHUB_ENV"
 
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
@@ -190,5 +197,3 @@ jobs:
           tags: |
             ghcr.io/predator2003/enclosed:latest-rootless
             ghcr.io/predator2003/enclosed:${{ env.RELEASE_VERSION }}-rootless
-            ghcr.io/ghcr.io/predator2003/enclosed:latest-rootless
-            ghcr.io/ghcr.io/predator2003/enclosed:${{ env.RELEASE_VERSION }}-rootless

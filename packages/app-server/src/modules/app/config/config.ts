@@ -289,5 +289,18 @@ export function getConfig({ env }: { env?: Record<string, string | undefined> } 
     { envSource: env },
   );
 
+  assertJwtSecretIsNotDefault({ config });
+
   return config;
+}
+
+// With the publicly known default secret anyone can forge session tokens, so an
+// instance that requires authentication must never run with it. This lives in
+// getConfig (not in an entrypoint) so every runtime enforces it: the Node server
+// fails at startup, and the Cloudflare worker - which resolves the config per
+// request - fails the request instead of accepting forged tokens.
+export function assertJwtSecretIsNotDefault({ config }: { config: { public: { isAuthenticationRequired: boolean }; authentication: { jwtSecret: string } } }) {
+  if (config.public.isAuthenticationRequired && config.authentication.jwtSecret === DEFAULT_JWT_SECRET) {
+    throw new Error('AUTHENTICATION_JWT_SECRET is still the default value while authentication is required, which would allow anyone to forge valid session tokens. Set a strong secret (e.g. `openssl rand -base64 48`).');
+  }
 }

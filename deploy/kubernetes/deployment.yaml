@@ -68,10 +68,15 @@ spec:
           resources:
             requests:
               cpu: 50m
-              memory: 128Mi
+              memory: 256Mi
             limits:
-              # Allow headroom for large encrypted payloads (50 MiB default cap).
-              memory: 512Mi
+              # A note upload is held in memory while it is parsed, and the JSON
+              # envelope roughly doubles the payload, so the ceiling has to cover
+              # several concurrent uploads at NOTES_MAX_ENCRYPTED_PAYLOAD_LENGTH
+              # (50 MiB by default) - otherwise a few parallel uploads OOM-kill the
+              # single replica. Lower the payload limit if you want a smaller pod,
+              # and keep the ingress connection limits below in place.
+              memory: 1Gi
       volumes:
         - name: data
           persistentVolumeClaim:

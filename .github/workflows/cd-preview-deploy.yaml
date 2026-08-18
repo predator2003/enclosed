@@ -1,5 +1,11 @@
 name: CD - Preview Deploy
 
+# This workflow runs in the privileged base-repository context (Cloudflare and
+# GitHub secrets in scope) and deploys a build artifact produced by CD - Preview
+# Build, which builds pull requests. Fork pull requests are therefore excluded:
+# deploying their build output would execute untrusted code under the project's
+# own domain, with production secrets in scope.
+
 on:
   workflow_run:
     workflows: [CD - Preview Build]
@@ -15,11 +21,11 @@ permissions:
 jobs:
   deploy-app-preview:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_repository.full_name == github.repository }}
     name: Deploy app preview
     steps:
       - name: Download app build artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         id: preview-app-build-artifact
         with:
           name: preview-app-build
@@ -28,7 +34,7 @@ jobs:
           run-id: ${{ github.event.workflow_run.id }}
 
       - name: Deploy preview app to Cloudflare Pages
-        uses: AdrianGonz97/refined-cf-pages-action@v1
+        uses: AdrianGonz97/refined-cf-pages-action@45ea15c1c69a7bce8ffbb79ba114daa2b52f0cff # v1
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -40,11 +46,11 @@ jobs:
 
   deploy-docs-preview:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_repository.full_name == github.repository }}
     name: Deploy docs preview
     steps:
       - name: Download docs build artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         id: preview-docs-build-artifact
         with:
           name: preview-docs-build
@@ -53,7 +59,7 @@ jobs:
           run-id: ${{ github.event.workflow_run.id }}
 
       - name: Deploy preview docs to Cloudflare Pages
-        uses: AdrianGonz97/refined-cf-pages-action@v1
+        uses: AdrianGonz97/refined-cf-pages-action@45ea15c1c69a7bce8ffbb79ba114daa2b52f0cff # v1
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

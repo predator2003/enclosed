@@ -30,6 +30,13 @@ for (const name of ['AUTHENTICATION_JWT_SECRET', 'AUTHENTICATION_USERS']) {
       process.exit(1);
     }
 
+    // An empty file would silently fall back to the config default (for the JWT
+    // secret: the publicly known placeholder), so refuse it instead.
+    if (!content) {
+      logger.error({ filePath }, `${name}_FILE is empty`);
+      process.exit(1);
+    }
+
     env[name] = content;
   }
 }
@@ -41,17 +48,11 @@ if (configError) {
   process.exit(1);
 }
 
-// With the default JWT secret anyone can forge authentication tokens, so a private
-// instance must not start with it (https://github.com/CorentinTh/enclosed/issues/445).
-if (config.authentication.jwtSecret === DEFAULT_JWT_SECRET) {
-  if (config.public.isAuthenticationRequired) {
-    logger.error('AUTHENTICATION_JWT_SECRET is still the default value while authentication is required, which would allow anyone to forge valid session tokens. Set a strong secret (e.g. `openssl rand -base64 48`) and restart.');
-    process.exit(1);
-  }
-
-  if (config.authentication.authUsers.length > 0) {
-    logger.warn('AUTHENTICATION_USERS is configured but AUTHENTICATION_JWT_SECRET is still the default value. Set a strong secret before enabling authentication.');
-  }
+// getConfig already refuses the default JWT secret when authentication is required
+// (https://github.com/CorentinTh/enclosed/issues/445); warn about the weaker case
+// where users are configured but authentication is not switched on yet.
+if (config.authentication.jwtSecret === DEFAULT_JWT_SECRET && config.authentication.authUsers.length > 0) {
+  logger.warn('AUTHENTICATION_USERS is configured but AUTHENTICATION_JWT_SECRET is still the default value. Set a strong secret before enabling authentication.');
 }
 
 const { storage } = createFsLiteStorage({ config });
