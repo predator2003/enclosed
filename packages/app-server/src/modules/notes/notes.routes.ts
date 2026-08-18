@@ -100,6 +100,10 @@ function setupConfirmNoteReadRoute({ app }: { app: ServerInstance }) {
 function setupGetNoteExistsRoute({ app }: { app: ServerInstance }) {
   app.get(
     '/api/notes/:noteId/exists',
+    // Without the guard this route would answer the existence question that the
+    // GET route deliberately refuses to answer for unauthenticated clients.
+    noteAccessGuardMiddleware,
+
     async (context) => {
       const { noteId } = context.req.param();
       const storage = context.get('storage');

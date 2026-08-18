@@ -73,7 +73,13 @@ export const LoginPage: Component = () => {
     const { accessToken } = loginResponse;
 
     authStore.setAccessToken({ accessToken });
-    window.location.href = authStore.getRedirectUrl() ?? '/';
+
+    // The stored redirect URL contains the note's decryption key, so it is read
+    // once and dropped before navigating.
+    const redirectUrl = authStore.getRedirectUrl();
+    authStore.clearRedirectUrl();
+
+    window.location.href = redirectUrl ?? '/';
   };
 
   return (

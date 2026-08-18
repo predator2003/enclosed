@@ -18,10 +18,18 @@ import { timeoutMiddleware } from './middlewares/timeout.middleware';
 
 export { createServer };
 
-// The note payload limit is enforced per-route on the parsed body; the body limit guards
-// the raw request stream so oversized bodies are rejected while streaming instead of being
-// buffered into memory first. The envelope accounts for the JSON fields around the payload.
+// The note payload limit is enforced per-route on the parsed body; the body limit rejects
+// oversized requests before the body is parsed. The envelope accounts for the JSON fields
+// around the payload.
 const BODY_ENVELOPE_OVERHEAD_BYTES = 1024 * 4;
+
+// A request that announces its size via Content-Length is rejected by the header alone,
+// but one without it (chunked transfer) is read into memory up to the limit before the
+// size is known - with a 50 MiB payload cap a handful of concurrent requests would be
+// enough to exhaust a small container. Legitimate clients (browser fetch/XHR with a
+// string body, the CLI, curl) always send Content-Length, so unsized bodies get a much
+// smaller allowance.
+const UNSIZED_BODY_MAX_BYTES = 1024 * 512;
 
 // When the client bundle is served by this server but talks to an API on another origin
 // (an absolute PUBLIC_BASE_API_URL), that origin must be allowed by connect-src.
@@ -73,7 +81,11 @@ function createServer({ config, storageFactory }: { config?: Config; storageFact
   // the environment (e.g. Cloudflare, where createServer receives no config object)
   // still honor NOTES_MAX_ENCRYPTED_PAYLOAD_LENGTH.
   app.use(async (context, next) => {
-    const maxSize = context.get('config').notes.maxEncryptedPayloadLength + BODY_ENVELOPE_OVERHEAD_BYTES;
+    const hasContentLength = context.req.raw.headers.has('content-length') && !context.req.raw.headers.has('transfer-encoding');
+
+    const maxSize = hasContentLength
+      ? context.get('config').notes.maxEncryptedPayloadLength + BODY_ENVELOPE_OVERHEAD_BYTES
+      : UNSIZED_BODY_MAX_BYTES;
 
     return bodyLimit({
       maxSize,

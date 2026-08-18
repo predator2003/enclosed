@@ -22,5 +22,8 @@ function injectPublicConfigInIndex({ publicConfig, indexHtmlContent }: { publicC
   // script element early.
   const serializedConfig = JSON.stringify(publicConfig).replace(/</g, '\\u003C');
 
-  return indexHtmlContent.replace('</head>', `<script type="application/json" id="enclosed-config">${serializedConfig}</script></head>`);
+  // The replacement is passed as a function: as a string, `$'`/`$&`/`$\`` inside a
+  // config value would be expanded by String.replace and splice surrounding document
+  // markup (including a literal </script>) into the block.
+  return indexHtmlContent.replace('</head>', () => `<script type="application/json" id="enclosed-config">${serializedConfig}</script></head>`);
 }
